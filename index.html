@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SHARE Brain Death Referral</title>
+  <meta name="description" content="Referral page for doctors who refer a patient with brain death to SHARE, Southern Philippines Medical Center." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#008037" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wdth,wght@62..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=3" />
+  <script src="js/config.js?v=2"></script>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-send" viewBox="0 -960 960 960"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></symbol>
+    <symbol id="i-check" viewBox="0 -960 960 960"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 -960 960 960"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/></symbol>
+    <symbol id="i-search" viewBox="0 -960 960 960"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></symbol>
+    <symbol id="i-chat" viewBox="0 -960 960 960"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 -960 960 960"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></symbol>
+    <symbol id="i-warning" viewBox="0 -960 960 960"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#refer">Skip to the referral form</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#top" aria-label="SHARE referral, top of page">
+        <img src="assets/share_logo.webp" width="44" height="44" alt="SHARE logo" />
+        <img src="assets/spmc_logo.webp" width="33" height="44" alt="Southern Philippines Medical Center logo" />
+        <span class="brand-text"><b>SHARE</b><small>Brain death referral</small></span>
+      </a>
+      <nav class="topnav" aria-label="Page sections">
+        <a href="#refer">Refer</a>
+        <a href="#status">Check status</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="intro wrap" aria-labelledby="intro-title">
+      <p class="kicker">Southern Philippines Medical Center Human Advocate and Retrieval Effort</p>
+      <h1 id="intro-title">Refer a patient with brain death.</h1>
+      <p class="lede">Paste your referral in the chat, the way you send it on Messenger. The reader fills in the form for you.
+        Check it, press <b>Send referral</b>, and the SHARE coordinator on duty gets it by email at once.</p>
+      <p class="demo-banner" id="demo-banner" hidden>Preview mode: no referral leaves this browser.</p>
+      <script>if (!window.SHARE_CONFIG.ENDPOINT) document.getElementById('demo-banner').hidden = false;</script>
+    </section>
+
+    <section id="refer" class="workspace wrap" aria-label="Referral">
+      <!-- Chat reader -->
+      <div class="panel chat" aria-labelledby="chat-title">
+        <div class="panel-head">
+          <svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>
+          <div>
+            <h2 id="chat-title">Referral reader</h2>
+            <p class="panel-sub" id="reader-state">Offline reader. No AI. Nothing is sent until you press Send referral.</p>
+          </div>
+        </div>
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="sr-only" for="paste">Paste the referral text</label>
+          <textarea id="paste" rows="5" placeholder="Name: Juan Dela Cruz, 45/M, ICU 3&#10;Dx: Acute CVD bleed, GCS 3&#10;Declared brain dead 11/05/2026 3:40 PM&#10;Referred by Dr. Maria Santos 0917 123 4567"></textarea>
+          <div class="composer-row">
+            <button type="button" class="btn-ghost" id="sample-btn">Try a sample</button>
+            <button type="submit" class="btn-send" id="read-btn" aria-label="Read referral">
+              <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg>
+              <span>Read</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Referral form -->
+      <div class="panel form-panel">
+        <form id="referral-form" novalidate>
+          <div class="hp" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <fieldset>
+            <legend>Patient</legend>
+            <div class="grid">
+              <div class="field span-2">
+                <label for="f-patient_name">Patient name <span class="req">required</span></label>
+                <input id="f-patient_name" name="patient_name" autocomplete="off" required maxlength="120" />
+                <p class="err" id="e-patient_name">Enter the patient's name.</p>
+              </div>
+              <div class="field">
+                <label for="f-hrn">Hospital record number</label>
+                <input id="f-hrn" name="hrn" autocomplete="off" maxlength="60" />
+              </div>
+              <div class="field field-pair">
+                <div>
+                  <label for="f-age">Age</label>
+                  <input id="f-age" name="age" inputmode="numeric" maxlength="3" />
+                  <p class="err" id="e-age">0 to 120.</p>
+                </div>
+                <div>
+                  <label for="f-sex">Sex</label>
+                  <select id="f-sex" name="sex">
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Unknown</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field span-2">
+                <label for="f-hospital">Referring hospital <span class="req">required</span></label>
+                <input id="f-hospital" name="hospital" list="hospitals" maxlength="160" required />
+                <datalist id="hospitals">
+                  <option value="Southern Philippines Medical Center"></option>
+                  <option value="Davao Doctors Hospital"></option>
+                  <option value="Brokenshire Medical Center"></option>
+                  <option value="San Pedro Hospital"></option>
+                  <option value="DMSF Hospital"></option>
+                  <option value="Davao Regional Medical Center"></option>
+                  <option value="Ricardo Limso Medical Center"></option>
+                  <option value="Metro Davao Medical and Research Center"></option>
+                </datalist>
+                <p class="err" id="e-hospital">Enter the hospital where the patient is.</p>
+              </div>
+              <div class="field">
+                <label for="f-ward">Ward / room</label>
+                <input id="f-ward" name="ward" maxlength="120" />
+              </div>
+              <div class="field">
+                <label for="f-admission_date">ER / admission date</label>
+                <input id="f-admission_date" name="admission_date" type="date" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Clinical</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="f-gcs">GCS at referral</label>
+                <select id="f-gcs" name="gcs">
+                  <option value="">Select</option>
+                  <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+                  <option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+                  <option>13</option><option>14</option><option>15</option>
+                </select>
+              </div>
+              <div class="field">
+                <span class="label" id="l-ventilator">On ventilator</span>
+                <div class="seg" role="radiogroup" aria-labelledby="l-ventilator">
+                  <label><input type="radio" name="ventilator" value="Yes" /><span>Yes</span></label>
+                  <label><input type="radio" name="ventilator" value="No" /><span>No</span></label>
+                  <label><input type="radio" name="ventilator" value="Unknown" /><span>Unknown</span></label>
+                </div>
+              </div>
+              <div class="field span-2">
+                <label for="f-diagnosis">Diagnosis</label>
+                <textarea id="f-diagnosis" name="diagnosis" rows="3" maxlength="2000"></textarea>
+              </div>
+              <div class="field">
+                <span class="label" id="l-brain_death">Brain death declared</span>
+                <div class="seg" role="radiogroup" aria-labelledby="l-brain_death">
+                  <label><input type="radio" name="brain_death" value="Yes" /><span>Yes</span></label>
+                  <label><input type="radio" name="brain_death" value="No" /><span>Not yet</span></label>
+                  <label><input type="radio" name="brain_death" value="Unknown" /><span>Unknown</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label for="f-brain_death_datetime">Date and time declared</label>
+                <input id="f-brain_death_datetime" name="brain_death_datetime" type="datetime-local" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Referring doctor</legend>
+            <div class="grid">
+              <div class="field span-2">
+                <label for="f-doctor_name">Your name <span class="req">required</span></label>
+                <input id="f-doctor_name" name="doctor_name" autocomplete="name" maxlength="120" required />
+                <p class="err" id="e-doctor_name">Enter your name so we can thank you and call you back.</p>
+              </div>
+              <div class="field">
+                <label for="f-prc">PRC number</label>
+                <input id="f-prc" name="prc" inputmode="numeric" maxlength="8" />
+                <p class="err" id="e-prc">5 to 8 digits.</p>
+              </div>
+              <div class="field">
+                <label for="f-contact_number">Contact number</label>
+                <input id="f-contact_number" name="contact_number" type="tel" autocomplete="tel" maxlength="20" />
+              </div>
+              <div class="field span-2">
+                <label for="f-doctor_email">Email <span class="opt">for your thank-you note and updates</span></label>
+                <input id="f-doctor_email" name="doctor_email" type="email" autocomplete="email" maxlength="120" />
+                <p class="err" id="e-doctor_email">Check the email address.</p>
+              </div>
+              <div class="field span-2">
+                <label for="f-notes">Notes for the coordinator</label>
+                <textarea id="f-notes" name="notes" rows="2" maxlength="2000"></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="form-foot">
+            <p class="form-msg" id="form-msg" role="alert"></p>
+            <button type="submit" class="btn-primary" id="submit-btn">
+              <span class="btn-label">Send referral</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+
+        <div class="success" id="success" hidden tabindex="-1">
+          <svg class="icon success-icon" aria-hidden="true"><use href="#i-check"/></svg>
+          <h2>Thank you, <span id="ok-doctor"></span>.</h2>
+          <p><b>We received your referral.</b> A SHARE coordinator is reviewing it and will contact your team.</p>
+          <div class="ref-box">
+            <span>Reference</span>
+            <b id="ok-ref">SHR-000000</b>
+            <button type="button" class="btn-ghost" id="copy-ref">
+              <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy</span>
+            </button>
+          </div>
+          <p class="ok-mail" id="ok-mail"></p>
+          <div class="success-actions">
+            <a class="btn-ghost" href="#status" id="ok-status-link">Check status</a>
+            <button type="button" class="btn-primary" id="new-referral">Refer another patient</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="status" class="status wrap" aria-labelledby="status-title">
+      <h2 id="status-title">Check a referral</h2>
+      <p class="panel-sub">Enter the reference from your thank-you screen or email. Only the status shows here, never patient details.</p>
+      <form class="status-form" id="status-form">
+        <label class="sr-only" for="status-ref">Reference</label>
+        <input id="status-ref" placeholder="SHR-7K3Q9X" autocomplete="off" autocapitalize="characters" maxlength="10" />
+        <button type="submit" class="btn-primary" id="status-btn">
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span>Check</span>
+        </button>
+      </form>
+      <div class="status-result" id="status-result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p><b>SHARE</b> &middot; Southern Philippines Medical Center Human Advocate and Retrieval Effort, Davao City.</p>
+      <p>Patient details go only to the SHARE referral sheet and the SHARE team's email. The page is not indexed by search engines.</p>
+    </div>
+  </footer>
+
+  <script src="js/reader.js?v=1"></script>
+  <script src="js/app.js?v=1"></script>
+</body>
+</html>

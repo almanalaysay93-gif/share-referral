@@ -111,50 +111,89 @@
   if (Speech) {
     mic.hidden = false;
     $('mic-note').hidden = false;
-    let rec = null;
-    let base = '';
     const label = mic.querySelector('span');
-    const stop = () => { if (rec) rec.stop(); };
-    mic.addEventListener('click', () => {
-      if (rec) { stop(); return; }
+    let rec = null;
+    let wanted = false;      // the doctor wants to keep listening
+    let base = '';           // paste box text before this dictation segment
+    let spoken = '';         // final speech text written so far in this segment
+    let doneIndex = 0;       // results before this index are already in `spoken`
+    let written = '';        // what this code last wrote into the box
+
+    const setLive = (live) => {
+      mic.classList.toggle('is-live', live);
+      mic.setAttribute('aria-pressed', String(live));
+      label.textContent = live ? 'Stop' : 'Speak';
+    };
+
+    // Start a recognition session. Chrome ends a session after a pause, so the session restarts while wanted.
+    const begin = () => {
       rec = new Speech();
       rec.lang = 'en-PH';
       rec.continuous = true;
       rec.interimResults = true;
+      rec.maxAlternatives = 1;
       base = paste.value ? paste.value.replace(/\s*$/, '\n') : '';
+      spoken = '';
+      doneIndex = 0;
+      written = paste.value;
+
       rec.onresult = (event) => {
-        let finalText = '';
-        let interim = '';
-        for (let i = 0; i < event.results.length; i++) {
-          const piece = event.results[i][0].transcript;
-          if (event.results[i].isFinal) finalText += piece + ' ';
-          else interim += piece;
+        // If the doctor typed into the box since the last update, keep their text and start a new segment.
+        if (paste.value !== written) {
+          base = paste.value.replace(/\s*$/, '\n');
+          spoken = '';
         }
-        paste.value = base + finalText + interim;
+        for (let i = doneIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            spoken += event.results[i][0].transcript.trim() + ' ';
+            doneIndex = i + 1;
+          }
+        }
+        let interim = '';
+        for (let i = doneIndex; i < event.results.length; i++) {
+          if (!event.results[i].isFinal) interim += event.results[i][0].transcript;
+        }
+        written = base + spoken + interim;
+        paste.value = written;
       };
+
       rec.onerror = (event) => {
+        if (event.error === 'aborted') return;
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') wanted = false;
         const msg = event.error === 'not-allowed' ? 'Allow the microphone for this page to use Speak.'
           : event.error === 'network' ? 'Speak needs an internet connection to your browser\'s speech service.'
-          : event.error === 'no-speech' ? 'I did not hear anything. Tap Speak and try again.'
+          : event.error === 'no-speech' ? 'I did not hear anything. Keep talking, or tap Speak again.'
           : 'Speak stopped (' + event.error + '). You can type or paste instead.';
-        addMsg('bot', [msg], 'msg-warn');
+        if (event.error !== 'no-speech') addMsg('bot', [msg], 'msg-warn');
       };
+
       rec.onend = () => {
         rec = null;
-        mic.classList.remove('is-live');
-        mic.setAttribute('aria-pressed', 'false');
-        label.textContent = 'Speak';
+        if (wanted) {
+          try { begin(); rec.start(); return; } catch (err) { wanted = false; }
+        }
+        setLive(false);
         $('reader-state').textContent = 'Offline reader. Paste, upload a file, or speak.';
         if (paste.value.trim()) paste.focus();
       };
+    };
+
+    mic.addEventListener('click', () => {
+      if (wanted) {
+        wanted = false;
+        if (rec) rec.stop();
+        return;
+      }
       try {
+        wanted = true;
+        begin();
         rec.start();
-        mic.classList.add('is-live');
-        mic.setAttribute('aria-pressed', 'true');
-        label.textContent = 'Stop';
+        setLive(true);
         $('reader-state').textContent = 'Listening… say the referral, then tap Stop and press Read.';
       } catch (err) {
+        wanted = false;
         rec = null;
+        setLive(false);
       }
     });
   }

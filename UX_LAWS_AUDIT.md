@@ -254,3 +254,10 @@ Checks:
 - 25 reader tests pass, including Word label tables, Excel label columns, Excel header rows, CSV, text and refused formats. Two mutations were caught.
 - In Chrome, uploading a test .docx filled 9 details: name, age, sex, hospital, ward, GCS, ventilator, doctor and brainstem notes. No console errors.
 - The Speak button showed in Chrome. Speech itself was not tested, because the test browser has no microphone.
+
+## Change on 2026-11-06: Speak fixes
+
+- Typed edits during dictation are kept. Before, each speech update rebuilt the box and erased them.
+- Listening restarts when Chrome ends a session after a pause, until the doctor taps Stop. Before, the page stopped and the doctor had to tap again.
+- Checked in Chrome with a stand-in speech engine: typed text survived, a restart kept the button live, and later speech was added after the typed text.
+- Not checked: real speech accuracy, which needs a microphone and Chrome on the phone.

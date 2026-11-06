@@ -223,3 +223,29 @@ test('onEdit stamps status time only for the status column', () => {
   ctx.onEdit({ range: web.getRange(2, 3) });
   assert.equal(web.data[1][11], 'old');
 });
+
+test('long pasted referral is kept up to 20000 characters', () => {
+  const { master, post } = setup();
+  const raw = 'NAME: SANTOS, PEDRO\n' + 'x'.repeat(15000);
+  post({ action: 'submit', referral: { ...VALID, raw_text: raw } });
+  assert.ok(master.data[4][24].includes(raw), 'full pasted text in Case notes');
+  const over = 'y'.repeat(25000);
+  post({ action: 'submit', referral: { ...VALID, raw_text: over } });
+  assert.ok(!master.data[5][24].includes(over));
+  assert.ok(master.data[5][24].includes('y'.repeat(20000)));
+});
+
+test('both emails show the clinical notes and the referral as sent', () => {
+  const { post, mails } = setup();
+  const raw = 'Good evening doctors!\nNAME: SANTOS, PEDRO\nNEURO PE:\nFixed dilated pupils';
+  post({ action: 'submit', referral: { ...VALID, notes: 'NIHSS: 35\nBrainstem: Fixed dilated pupils', raw_text: raw } });
+  const [team, thanks] = mails;
+  for (const m of [team, thanks]) {
+    assert.match(m.htmlBody, /Clinical notes/);
+    assert.match(m.htmlBody, /NIHSS: 35/);
+    assert.match(m.htmlBody, /Referral as sent/);
+    assert.ok(m.htmlBody.includes('Good evening doctors!\nNAME: SANTOS, PEDRO'), 'line breaks kept');
+    assert.match(m.body, /Referral as sent/);
+  }
+  assert.match(thanks.htmlBody, /Acute CVD bleed/);
+});

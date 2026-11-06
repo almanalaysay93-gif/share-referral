@@ -27,7 +27,7 @@ var WEB_HEADERS = [
 
 var LIMITS = {
   patient_name: 120, hrn: 60, hospital: 160, ward: 120, diagnosis: 2000, doctor_name: 120,
-  prc: 12, doctor_email: 120, contact_number: 20, notes: 2000, raw_text: 6000
+  prc: 12, doctor_email: 120, contact_number: 20, notes: 2000, raw_text: 20000
 };
 
 /* ---------- HTTP ---------- */
@@ -310,10 +310,29 @@ function table_(rows) {
     }).join('') + '</table>';
 }
 
+/** Clinical notes and the referral text exactly as the doctor sent it, for both emails. */
+function referralSections_(input) {
+  var box = 'margin:0;padding:12px 14px;background:#ffffff;border:1px solid #d9e2cf;border-radius:10px;' +
+    'white-space:pre-wrap;word-break:break-word;font:13px/1.5 Consolas,Menlo,monospace;color:#16261b';
+  var head = 'margin:18px 0 6px;font-weight:bold;color:#0d3b21';
+  var html = '', text = '';
+  if (input.notes) {
+    html += '<p style="' + head + '">Clinical notes</p><pre style="' + box + '">' + esc_(input.notes) + '</pre>';
+    text += '\n\nClinical notes\n' + input.notes;
+  }
+  if (input.raw_text) {
+    html += '<p style="' + head + '">Referral as sent</p><pre style="' + box + '">' + esc_(input.raw_text) + '</pre>';
+    text += '\n\nReferral as sent\n' + input.raw_text;
+  }
+  return { html: html, text: text };
+}
+
 function sendTeamEmail_(input, saved) {
   try {
-    var rows = transcribedRows_(saved);
-    var bd = input.brain_death === 'Yes' ? 'DECLARED BRAIN DEATH' : 'Brain death referral';
+    // Case notes (Y) repeats the clinical notes and the pasted text, so the email shows those once, below.
+    var rows = transcribedRows_(saved).filter(function (r) { return r[0] !== 'Case notes (Y)'; });
+    var extra = referralSections_(input);
+    var bd =input.brain_death === 'Yes' ? 'DECLARED BRAIN DEATH' : 'Brain death referral';
     var subject = '[SHARE referral] ' + bd + ' - ' + input.hospital + ' - ' + saved.admissionId;
     var sheetUrl = book_().getUrl();
     var html =
@@ -324,11 +343,11 @@ function sendTeamEmail_(input, saved) {
       '<p style="margin:0 0 14px">Referring doctor: <b>' + esc_(input.doctor_name) + '</b>' +
       (input.contact_number ? ' &middot; ' + esc_(input.contact_number) : '') +
       (input.doctor_email ? ' &middot; ' + esc_(input.doctor_email) : '') + '</p>' +
-      table_(rows) +
+      table_(rows) + extra.html +
       '<p style="margin:16px 0 0"><a href="' + esc_(sheetUrl) + '" style="color:#008037">Open the sheet</a>. ' +
       'Set the status in the ' + WEB_TAB + ' tab so the doctor can follow the case.</p></div>';
     var text = 'New referral ' + saved.reference + ' written to ' + MASTER_TAB + ' row ' + saved.row + '.\n\n' +
-      rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n') + '\n\n' + sheetUrl;
+      rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n') + extra.text + '\n\n' + sheetUrl;
     MailApp.sendEmail({ to: alertEmails_(), subject: subject, body: text, htmlBody: html, name: 'SHARE Referral Portal' });
     return true;
   } catch (err) {
@@ -343,9 +362,11 @@ function sendThankYou_(input, saved) {
     var statusLink = site ? site.replace(/#.*$/, '').replace(/[^/]*$/, '') + 'status.html?ref=' + encodeURIComponent(saved.reference) : '';
     var summary = [
       ['Reference', saved.reference], ['Patient', input.patient_name], ['Hospital', input.hospital],
-      ['Ward / room', input.ward], ['GCS', input.gcs], ['Brain death declared', input.brain_death || 'Unknown'],
+      ['Ward / room', input.ward], ['GCS', input.gcs], ['Diagnosis', input.diagnosis],
+      ['Brain death declared', input.brain_death || 'Unknown'], ['On ventilator', input.ventilator],
       ['Received', fmt_(saved.now)]
-    ];
+    ].filter(function (r) { return r[1] !== '' && r[1] != null; });
+    var extra = referralSections_(input);
     var html =
       '<div style="font:15px Arial,sans-serif;color:#16261b;max-width:600px;line-height:1.55">' +
       '<div style="background:#008037;color:#fff;padding:22px 24px;border-radius:14px 14px 0 0">' +
@@ -355,14 +376,14 @@ function sendThankYou_(input, saved) {
       '<p style="margin:0 0 12px"><b>We received your referral.</b> Thank you for referring this patient to SHARE. ' +
       'A coordinator is reviewing it and will contact your team.</p>' +
       '<p style="margin:0 0 8px;font-weight:bold;color:#0d3b21">Your referral</p>' +
-      table_(summary) +
+      table_(summary) + extra.html +
       (statusLink ? '<p style="margin:16px 0 0">Follow the case: <a href="' + esc_(statusLink) + '" style="color:#008037;font-weight:bold">check status for ' + esc_(saved.reference) + '</a></p>' : '') +
       '<p style="margin:16px 0 0">With gratitude,<br><b>The SHARE Team</b><br>Southern Philippines Medical Center Human Advocate and Retrieval Effort</p>' +
       '</div></div>';
     var text = 'Thank you, ' + input.doctor_name + '.\n\nWe received your referral ' + saved.reference +
       '. Thank you for referring this patient to SHARE. A coordinator is reviewing it and will contact your team.\n\n' +
       'Your referral\n' +
-      summary.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n') +
+      summary.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n') + extra.text +
       (statusLink ? '\n\nCheck status: ' + statusLink : '') + '\n\nWith gratitude,\nThe SHARE Team';
     MailApp.sendEmail({
       to: input.doctor_email,

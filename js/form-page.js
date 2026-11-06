@@ -80,7 +80,7 @@
   function collect() {
     const data = {};
     Object.keys(LABELS).forEach((n) => { data[n] = getValue(n); });
-    data.raw_text = rawTexts.join('\n---\n').slice(0, 6000);
+    data.raw_text = rawTexts.join('\n---\n').slice(0, 20000);
     return data;
   }
 

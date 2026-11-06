@@ -1,0 +1,73 @@
+Good evening doctors!
+
+Respectfully referring patient:
+NAME: SANTOS, PEDRO
+AGE/SEX: 57/M
+LOCATION: ER RED ZONE
+
+CURRENT WORKING IMPRESSION:
+ACUTE CEREBROVASCULAR DISEASE BLEED, LEFT FRONTOTEMPORAL LOBES WITH INTRAVENTRICULAR EXTENSION WITH SUBFALCINE AND UNCAL HERNIATION (~144 ML), HYPERTENSIVE ETIOLOGY, ICTUS 11/2/26, NIHSS 32, INTRACEREBRAL HEMORRHAGE SCORE 4
+FOCAL TO BILATERAL TONIC-CLONIC SEIZURE, STRUCTURAL CAUSE
+DYSLIPIDEMIA
+DIABETES MELLITUS TYPE II
+HYPERTENSIVE CARDIOVASCULAR DISEASE, LEFT VENTRICULAR HYPERTROPHY, SINUS RHYTHM, FUNCTIONAL CLASS II
+
+CHIEF COMPLAINT: RIGHT HEMIPLEGIA AND DECREASED SENSORIUM
+
+HANDEDNESS: RIGHT-HANDED
+BASELINE FUNCTIONAL CAPACITY: PRE-MORBID MRS 0
+
+STROKE TIMELINES
+Last known well: 11/2/26 7AM
+ER Arrival: 11/2/26 8:51 AM
+Door to CT: 11/2/26 10:46 AM (2H 55 MINS)
+Door to Needle: N/A
+
+HPI:
+The patient was last seen well by his brother at 7am. At ER arrival the patient was already obtunded and was subsequently intubated. He developed focal to bilateral tonic clonic seizures and was given total doses of Diazepam 20 mg IV and was subsequently admitted.
+
+ROS:
+GENERAL: No fever. No weight loss.
+NEUROLOGIC: No memory deficits. No prior seizures. No blurring of vision, diplopia.
+
+PAST MEDICAL HX:
+Hypertensive on Felodipine 5 mg tablet once a day.
+
+VITAL SIGNS:
+BP: 180/110 HR: 115 RR: 18 T: 36.6C O2 sat: 100% at FiO2 100%
+Wt: 115 kg Ht: 172 cm BMI: 38.9 kg CBG at ER: 137 mg/dL
+
+SYSTEMIC PE:
+CARDIAC: Adynamic precordium, no murmurs
+CHEST and LUNGS: Equal chest expansion, Clear breath sounds
+
+NEURO PE:
+GCS 3
+Fixed dilated pupils
+(-) doll's eye reflex
+(-) corneal reflex, bilateral
+(-) gag reflex
+(+) spontaneous breathing
+
+NIHSS: 35
+C = 3
+LA = 4
+
+CRANIAL CT SCAN 11/2/26
+ACUTE BLEED (144 CC), LEFT FRONTOTEMPORAL LOBES, WITH INTRAVENTRICULAR EXTENSION
+SECONDARY MASS EFFECT, CEREBRAL EDEMA, RIGHTWARD SUBFALCINE HERNIATION (1.4 CM) AND UNCAL HERNIATION
+POLYSINUSITIS
+
+PLANS:
+ADMIT TO ER CIU/ER ICU
+[MV SETTINGS]:
+VACV mode
+FiO2 100%
+
+PLANS:
+Continue Mannitol 250mL IV q4h
+Refer to SHARE team
+
+As conferred with CIC, will not proceed with BD yet since given with diazepam max dose.
+
+Thank you!

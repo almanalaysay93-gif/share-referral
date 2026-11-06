@@ -55,7 +55,8 @@
     list.textContent = '';
     const names = Object.keys(LABELS).filter((n) => state.fields[n]);
     names.forEach((n) => {
-      const row = el('div', 'found-row');
+      const long = n === 'notes' || n === 'diagnosis';
+      const row = el('div', 'found-row' + (long ? ' is-long' : ''));
       row.append(el('dt', null, LABELS[n]), el('dd', null, show(n, state.fields[n])));
       list.appendChild(row);
     });

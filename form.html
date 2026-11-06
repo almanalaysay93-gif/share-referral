@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wdth,wght@62..125,500..900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=6" />
+  <link rel="stylesheet" href="css/styles.css?v=7" />
   <link rel="preload" as="image" href="assets/art/kidneys.webp" />
-  <script src="js/config.js?v=4"></script>
+  <script src="js/config.js?v=5"></script>
   <script>if (!window.SHARE_CONFIG.ENDPOINT) document.documentElement.classList.add('is-demo');</script>
 </head>
 <body class="page-form">
@@ -194,8 +194,8 @@
                 <p class="err" id="e-doctor_email">Check the email address.</p>
               </div>
               <div class="field span-2">
-                <label for="f-notes">Notes for the coordinator</label>
-                <textarea id="f-notes" name="notes" rows="2" maxlength="2000"></textarea>
+                <label for="f-notes">Clinical notes for the coordinator <span class="opt">brainstem reflexes, CT, NIHSS, vital signs</span></label>
+                <textarea id="f-notes" name="notes" rows="7" maxlength="2000"></textarea>
               </div>
             </div>
           </fieldset>
@@ -238,7 +238,7 @@
   </footer>
 
   <script src="js/vendor/anime.umd.min.js?v=4.5.0"></script>
-  <script src="js/common.js?v=1"></script>
+  <script src="js/common.js?v=2"></script>
   <script src="js/motion.js?v=1"></script>
   <script src="js/form-page.js?v=1"></script>
 </body>

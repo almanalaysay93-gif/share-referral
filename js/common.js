@@ -10,7 +10,7 @@
     ward: 'Ward / room', admission_date: 'Admission date', gcs: 'GCS', diagnosis: 'Diagnosis',
     brain_death: 'Brain death declared', brain_death_datetime: 'Time declared', ventilator: 'Ventilator',
     doctor_name: 'Your name', prc: 'PRC number', doctor_email: 'Email', contact_number: 'Contact number',
-    notes: 'Notes',
+    notes: 'Clinical notes',
   };
 
   function el(tag, cls, text) {

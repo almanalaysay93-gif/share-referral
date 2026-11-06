@@ -142,3 +142,56 @@ class EdgeTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+LONG = (Path(__file__).resolve().parent / "fixtures" / "long_ich_referral.txt").read_text(encoding="utf-8")
+
+
+class LongClinicalReferralTests(unittest.TestCase):
+    """De-identified copy of a real SPMC neurology referral with section headings."""
+
+    def setUp(self):
+        self.f = parse_referral(LONG, TODAY)["fields"]
+
+    def test_identity(self):
+        self.assertEqual(self.f["patient_name"], "SANTOS, PEDRO")
+        self.assertEqual((self.f["age"], self.f["sex"]), ("57", "Male"))
+        self.assertEqual(self.f["ward"], "ER RED ZONE")
+        self.assertEqual(self.f["gcs"], "3")
+        self.assertEqual(self.f["ventilator"], "Yes")
+
+    def test_diagnosis_from_impression_block(self):
+        dx = self.f["diagnosis"]
+        self.assertTrue(dx.startswith("ACUTE CEREBROVASCULAR DISEASE BLEED"), dx)
+        self.assertIn("DIABETES MELLITUS TYPE II", dx)
+        self.assertNotIn("CHIEF COMPLAINT", dx)
+
+    def test_admission_from_er_arrival(self):
+        self.assertEqual(self.f["admission_date"], "2026-11-02")
+
+    def test_bd_not_yet(self):
+        self.assertEqual(self.f["brain_death"], "No")
+        self.assertEqual(self.f["brain_death_datetime"], "")
+
+    def test_clinical_notes(self):
+        notes = self.f["notes"]
+        for part in (
+            "Chief complaint: RIGHT HEMIPLEGIA AND DECREASED SENSORIUM",
+            "Last known well: 11/2/26 7AM",
+            "NIHSS: 35",
+            "ICH score: 4",
+            "Fixed dilated pupils",
+            "(-) corneal reflex, bilateral",
+            "(+) spontaneous breathing",
+            "BP: 180/110",
+            "CT 11/2/26: ACUTE BLEED (144 CC)",
+            "UNCAL HERNIATION",
+            "will not proceed with BD yet since given with diazepam max dose",
+        ):
+            self.assertIn(part, notes)
+        self.assertNotIn("No memory deficits", notes)
+        self.assertNotIn("Mannitol", notes)
+        self.assertLessEqual(len(notes), 2000)
+
+    def test_short_referrals_keep_empty_notes(self):
+        self.assertEqual(parse_referral(LABELLED, TODAY)["fields"]["notes"], "")

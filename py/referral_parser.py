@@ -42,9 +42,11 @@ LABELS = {
     "admission_date": [
         "er admission date", "date of admission", "admission date", "date admitted",
         "er admission", "admitted on", "admitted", "admission", "doa",
+        "date of arrival", "er arrival", "arrival",
     ],
     "gcs": ["gcs score", "gcs at referral", "gcs"],
     "diagnosis": [
+        "current working impression", "working impression", "initial impression", "cwi",
         "actual diagnosis", "admitting diagnosis", "working diagnosis", "final diagnosis",
         "diagnosis", "impression", "assessment", "dx",
     ],
@@ -316,7 +318,10 @@ def _yes_no(value):
 def _brain_death_from_text(text):
     lowered = text.lower()
     not_yet = re.search(
-        r"\b(?:not\s+(?:yet\s+)?(?:declared\s+)?brain\s*dead|for\s+(?:brain\s*death|bd)\s*"
+        r"\b(?:not\s+(?:yet\s+)?(?:declared\s+)?brain\s*dead|"
+        r"(?:not|never)\s+(?:to\s+)?(?:proceed|push\s+through|do|start)\w*\s+(?:with\s+)?(?:the\s+)?(?:bd|brain\s*death)\b|"
+        r"(?:bd|brain\s*death)\s+(?:is\s+)?not\s+yet|deferred?\s+(?:the\s+)?(?:bd|brain\s*death)|"
+        r"for\s+(?:brain\s*death|bd)\s*"
         r"(?:evaluation|eval|assessment|testing|declaration|protocol)?|for\s+apnea\s+test|"
         r"(?:possible|suspected|impending|probable|r/o)\s+brain\s*death)\b",
         lowered,
@@ -413,6 +418,104 @@ def _normalize_phone(value):
     return digits
 
 
+HEADING_RE = re.compile(r"^\s*\[?([A-Za-z][A-Za-z /&'().-]{1,60}?)\]?\s*:\s*$")
+BLANK_RE = re.compile(r"^\s*$")
+DIAGNOSIS_HEADINGS = (
+    "current working impression", "working impression", "initial impression", "impression",
+    "admitting diagnosis", "working diagnosis", "diagnosis", "assessment",
+)
+NEURO_HEADINGS = (
+    "neuro pe", "neuro exam", "neurologic exam", "neurological exam", "neurologic examination",
+    "neurological examination", "neuro",
+)
+BRAINSTEM_RE = re.compile(
+    r"pupil|doll'?s\s*eye|oculocephalic|oculovestibular|caloric|corneal|gag\b|cough\s+reflex|"
+    r"spontaneous\s+(?:breath|respiration)|apnea|brainstem|motor\s+response|posturing",
+    re.I,
+)
+IMAGING_RE = re.compile(
+    r"^\s*(?:(?:cranial|plain|cranial\s+plain|head)\s+)?(?:ct|mri)\b[^:\n]*?"
+    r"(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})?\s*:?\s*$",
+    re.I,
+)
+
+
+def _block_after(lines, index):
+    """Lines after lines[index], up to the next blank line or heading."""
+    body = []
+    for following in lines[index + 1:]:
+        if BLANK_RE.match(following) or HEADING_RE.match(following):
+            break
+        body.append(_clean(following))
+    return body
+
+
+def _section(text, names):
+    """Lines under a heading that stands alone ('IMPRESSION:'), up to the next blank line or heading."""
+    lines = text.split("\n")
+    for index, line in enumerate(lines):
+        match = HEADING_RE.match(line)
+        if match and _clean(match.group(1)).lower() in names:
+            body = _block_after(lines, index)
+            if body:
+                return body
+    return []
+
+
+def _line_value(text, pattern):
+    match = re.search(r"^\s*(?:" + pattern + r")\s*:\s*(.+)$", text, re.I | re.M)
+    return _clean(match.group(1)) if match else ""
+
+
+def _clinical_notes(text):
+    """Clinical facts the SHARE coordinator needs that have no column of their own in the sheet."""
+    notes = []
+
+    def add(label, value):
+        if value:
+            notes.append(label + ": " + value)
+
+    add("Chief complaint", _line_value(text, r"chief\s+complaint|cc"))
+    add("Last known well", _line_value(text, r"last\s+known\s+well|lkw"))
+    nihss = re.findall(r"\bnihss\b\s*[:=]?\s*(\d{1,2})\b", text, re.I)
+    if nihss:
+        add("NIHSS", nihss[-1])
+    ich = re.search(r"\b(?:intracerebral\s+hemorrhage|ich)\s+score\s*[:=]?\s*(\d)\b", text, re.I)
+    if ich:
+        add("ICH score", ich.group(1))
+
+    neuro = _section(text, NEURO_HEADINGS)
+    pool = neuro or text.split("\n")
+    brainstem = []
+    for line in pool:
+        line = _clean(line)
+        if (line and len(line) <= 90 and BRAINSTEM_RE.search(line)
+                and not re.match(r"^(?:no|denies)\b", line, re.I) and line not in brainstem):
+            brainstem.append(line)
+    add("Brainstem", "; ".join(brainstem))
+
+    add("Vital signs", " | ".join(_section(text, ("vital signs", "vitals", "vs"))[:2]))
+
+    lines = text.split("\n")
+    for index, line in enumerate(lines):
+        match = IMAGING_RE.match(line)
+        body = _block_after(lines, index) if match else []
+        if body:
+            add("CT " + match.group(1) if match.group(1) else "CT", "; ".join(body))
+            break
+
+    remarks = []
+    for sentence in re.split(r"(?<=[.!?])\s+|\n", text):
+        sentence = _clean(sentence)
+        if (re.search(r"\b(?:bd|brain\s*death|brain\s*dead|apnea\s+test)\b", sentence, re.I)
+                and not re.search(r"\brefer", sentence, re.I) and len(sentence) <= 240
+                and not LABEL_RE.match(sentence) and sentence.rstrip(".") not in brainstem):
+            remarks.append(sentence.rstrip(".") + ".")
+    add("Brain death remark", " ".join(remarks[:3]))
+
+    return "\n".join(notes)[:1990]
+
+
 def parse_referral(text, today=None):
     """Read a free-text referral. Return fields, found, missing and notes."""
     text = (text or "").replace("\r\n", "\n").replace("\r", "\n")
@@ -454,6 +557,8 @@ def parse_referral(text, today=None):
     fields["gcs"] = fields["gcs"] or _parse_gcs(text)
 
     fields["diagnosis"] = labelled.get("diagnosis", "")
+    if not fields["diagnosis"]:
+        fields["diagnosis"] = "; ".join(_section(text, DIAGNOSIS_HEADINGS))[:2000]
 
     bd_label = labelled.get("brain_death", "")
     fields["brain_death"] = _yes_no(bd_label) if bd_label else ""
@@ -485,7 +590,8 @@ def parse_referral(text, today=None):
     fields["doctor_email"] = email_match.group(0).lower() if email_match else ""
 
     fields["contact_number"] = _normalize_phone(labelled.get("contact_number", "")) or _normalize_phone(text)
-    fields["notes"] = labelled.get("notes", "")
+    clinical = _clinical_notes(text)
+    fields["notes"] = "\n".join(part for part in (labelled.get("notes", ""), clinical) if part)[:2000]
 
     found = [name for name in FIELDS if fields[name]]
     missing = [name for name in REQUIRED if not fields[name]]

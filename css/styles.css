@@ -233,20 +233,19 @@ button { font: inherit; cursor: pointer; }
   transition: box-shadow 140ms ease, background 160ms ease, opacity 160ms ease;
 }
 .btn-primary, .btn-send {
-  background: linear-gradient(180deg, #087838 0%, #008037 46%, #007233 100%);
+  background: #008037;
   color: #fff;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    inset 0 -2px 0 rgba(0, 40, 16, 0.18),
+    inset 0 -2px 0 rgba(0, 40, 16, 0.22),
     0 6px 0 #004e1f,
     0 10px 16px rgba(13, 59, 33, 0.2);
 }
 .btn-primary { padding: 12px 24px; font-size: 1rem; }
 .btn-send { padding: 10px 18px; }
 .btn-primary:hover, .btn-send:hover {
-  background: linear-gradient(180deg, #087838 0%, #00612a 100%);
+  background: #00702f;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -2px 0 rgba(0, 40, 16, 0.22),
     0 7px 0 #004018,
     0 14px 18px rgba(13, 59, 33, 0.24);
 }
@@ -257,29 +256,35 @@ button { font: inherit; cursor: pointer; }
 }
 .btn-primary:disabled, .btn-send:disabled {
   opacity: 0.6; cursor: progress;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 0 #004e1f;
 }
+/* Ghost buttons: sage clay, no white face. */
 .btn-ghost {
-  background: linear-gradient(180deg, #ffffff 0%, #e7efe0 100%);
-  color: var(--green-deep);
+  background: #dde8d2;
+  color: var(--green-ink);
   padding: 8px 16px;
   box-shadow:
-    inset 0 1px 0 #fff,
-    0 4px 0 #b7c9a8,
+    inset 0 -2px 0 rgba(13, 59, 33, 0.08),
+    0 4px 0 #a9be98,
     0 8px 14px rgba(13, 59, 33, 0.12);
 }
 .btn-ghost:hover {
-  background: linear-gradient(180deg, #f7faf3 0%, #dce7d0 100%);
+  background: #d1e0c3;
   box-shadow:
-    inset 0 1px 0 #fff,
-    0 5px 0 #a9be98,
+    inset 0 -2px 0 rgba(13, 59, 33, 0.08),
+    0 5px 0 #9bb389,
     0 10px 16px rgba(13, 59, 33, 0.14);
 }
 .btn-ghost:active {
   box-shadow:
-    inset 0 3px 6px rgba(13, 59, 33, 0.16),
-    0 1px 0 #b7c9a8;
+    inset 0 3px 6px rgba(13, 59, 33, 0.18),
+    0 1px 0 #a9be98;
 }
+/* Click burst particles (js/clickfx.js). */
+.burst { position: fixed; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 60; }
+.burst i { position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: #008037; box-shadow: 0 0 8px rgba(0, 128, 55, 0.55); }
+.burst i.is-sage { background: #9cc48a; box-shadow: 0 0 8px rgba(156, 196, 138, 0.7); }
+.burst i.is-ring { width: 16px; height: 16px; left: -8px; top: -8px; background: transparent; border: 2px solid #008037; box-shadow: none; }
 .spinner { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255, 255, 255, 0.4); border-top-color: #fff; border-radius: 50%; animation: spin 700ms linear infinite; }
 .busy .spinner { display: inline-block; }
 

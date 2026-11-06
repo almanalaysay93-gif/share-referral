@@ -183,3 +183,21 @@ Checks:
 - About 100 frames per second, slowest frame 20 ms, on this PC.
 - At 390 x 844 with the CPU slowed 4 times: about 49 frames per second, slowest frame 30 ms, no horizontal overflow.
 - No console errors or warnings.
+
+## Change on 2026-11-06: buttons without white, click burst and chime
+
+- Primary and send buttons are solid SHARE green with no white top highlight.
+- Ghost buttons are sage clay (#dde8d2) with dark green text, no white face.
+- `js/clickfx.js` adds a burst of 14 green and sage particles and a ring at the click point on every button and step link, animated with Anime.js.
+- A soft two-note chime plays on click. It is generated with Web Audio in code, with no sound file, at a low volume.
+- Links wait 170 ms before they open so the burst and chime can play. Form buttons do not wait.
+- Keyboard clicks burst from the button centre.
+- Reduced motion: no burst. The chime still plays.
+
+Checks:
+
+- Chrome at 1440 x 900: a click on Check a referral made a burst with 15 elements, the page stayed for 120 ms, then opened `status.html`.
+- Burst particles moved about 45 px out and shrank to scale 0.04 within 450 ms, then the burst element was removed.
+- Lighthouse mobile on `read.html`: accessibility 100, best practices 100.
+- No console errors or warnings.
+- The chime was not heard in this test, because the browser test has no sound output.

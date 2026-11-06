@@ -223,3 +223,11 @@ Checks:
 - Preview-mode browser run: the `?ref=` link found the referral, a pasted update filled brain death, time, GCS, ventilator, expired, time of death and DNR, and the update was sent.
 - At 390 x 844 the four-step nav fits with no horizontal overflow. Lighthouse mobile accessibility 100. No console errors.
 - The live Apps Script still runs the old code and answers "Unknown action." until it is redeployed.
+
+## Change on 2026-11-06: hero organ morph
+
+- The landing hero organ now cycles heart, lungs, liver, kidneys, pancreas and corneas.
+- Each change is a liquid morph: an SVG turbulence displacement filter swells to about 60 and settles to 0 (Anime.js tweens its scale) while the old organ shrinks and fades and the new organ grows in on a spring.
+- The first chip names the organ and the disease it treats, and changes with the organ.
+- The loop pauses while the hero is off screen or the tab is hidden. With reduced motion the heart stays still.
+- Check: in Chrome over 10.5 s the sequence ran heart, lungs, liver, kidneys, the distortion peaked at 61.9, and the chip read "2 kidneys: free 2 people from dialysis". No console errors.

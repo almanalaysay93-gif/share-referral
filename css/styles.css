@@ -428,3 +428,10 @@ main, .footer { position: relative; z-index: 1; }
 .check input { width: 20px; height: 20px; min-height: 0; accent-color: var(--green); box-shadow: none; }
 .check:has(input:checked) { background: #eaf6ea; outline: 1.5px solid #7cb98c; }
 .status-update { margin-top: 14px; }
+
+/* Landing hero organ morph (js/motion.js). The stack keeps the organ box square; images cross-fade inside it. */
+.organ-stack { aspect-ratio: 1; height: auto; }
+.organ-stack img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; }
+.organ-stack img.is-on { opacity: 1; }
+.organ-stack.is-morphing img { filter: url(#organ-morph); will-change: opacity, transform; }
+.chip-1 [data-organ-label] { display: inline-block; }

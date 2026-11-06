@@ -61,7 +61,54 @@
     landingTitle(title);
     chipsAndCounts();
     sectionTitles();
+    organMorph();
     return;
+  }
+
+  // Landing hero: the organ morphs from one organ to the next. An SVG turbulence distortion swells and
+  // settles (Anime.js tweens its scale) while the two images cross-fade, so the shapes seem to melt into
+  // each other. The disease chip follows the organ. Pauses when the hero is off screen or the tab is hidden.
+  function organMorph() {
+    const stack = hero.querySelector('[data-morph]');
+    const map = document.getElementById('organ-morph-map');
+    const label = hero.querySelector('[data-organ-label]');
+    if (!stack || !map) return;
+    const imgs = Array.from(stack.querySelectorAll('img'));
+    let index = 0;
+    let visible = true;
+    let busy = false;
+    const HOLD = 2600;
+
+    new IntersectionObserver((entries) => { visible = entries[0].isIntersecting; }).observe(hero);
+
+    function next() {
+      if (busy || !visible || document.hidden) { setTimeout(next, 800); return; }
+      busy = true;
+      const from = imgs[index];
+      index = (index + 1) % imgs.length;
+      const to = imgs[index];
+      const distort = { s: 0 };
+      stack.classList.add('is-morphing');
+      const tl = A.createTimeline({ onComplete: () => {
+        stack.classList.remove('is-morphing');
+        from.classList.remove('is-on');
+        to.classList.add('is-on');
+        busy = false;
+        setTimeout(next, HOLD);
+      } });
+      // Melt: distortion rises while the old organ shrinks and fades.
+      tl.add(distort, { s: 70, duration: 520, ease: 'in(2)', onUpdate: () => map.setAttribute('scale', distort.s.toFixed(1)) }, 0);
+      tl.add(from, { opacity: [1, 0], scale: [1, 0.86], duration: 620, ease: 'in(2)' }, 0);
+      // Form: the new organ grows out of the distortion, which settles back to zero.
+      tl.add(to, { opacity: [0, 1], scale: [1.12, 1], duration: 760, ease: A.spring({ bounce: 0.2, duration: 760 }) }, 300);
+      tl.add(distort, { s: 0, duration: 620, ease: 'out(3)', onUpdate: () => map.setAttribute('scale', distort.s.toFixed(1)) }, 520);
+      if (label) {
+        tl.add(label, { opacity: [1, 0], y: [0, -6], duration: 220, ease: 'in(2)',
+          onComplete: () => { label.textContent = to.dataset.label || ''; } }, 160);
+        tl.add(label, { opacity: [0, 1], y: [6, 0], duration: 320, ease: 'out(3)' }, 420);
+      }
+    }
+    setTimeout(next, 3200);
   }
 
   // Landing section headings: letters rise on a spring when the heading scrolls into view, the small

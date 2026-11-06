@@ -67,7 +67,7 @@
 
   addMsg('bot', [
     'Good day, doctor. Thank you for thinking of SHARE.',
-    'Paste the referral the way you would send it on Messenger. I will read it here on your phone, then you check it on the next page. Nothing is sent until you press Send referral.',
+    'Give me the referral in any of these ways: paste it the way you send it on Messenger, upload a Word, Excel or CSV file, or tap Speak and say it. I read it here on your phone, then you check it on the next page. Nothing is sent until you press Send referral.',
   ]);
   if (Object.keys(state.fields).length) {
     addMsg('bot', 'Your last reading is still here. Paste more to add to it, or continue.');

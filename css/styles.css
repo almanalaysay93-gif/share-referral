@@ -285,6 +285,8 @@ button { font: inherit; cursor: pointer; }
 .burst i { position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: #008037; box-shadow: 0 0 8px rgba(0, 128, 55, 0.55); }
 .burst i.is-sage { background: #9cc48a; box-shadow: 0 0 8px rgba(156, 196, 138, 0.7); }
 .burst i.is-ring { width: 16px; height: 16px; left: -8px; top: -8px; background: transparent; border: 2px solid #008037; box-shadow: none; }
+.burst i.is-ring.is-sage { border-color: #9cc48a; }
+.burst i.is-spark { width: 3px; height: 12px; left: -1.5px; top: -6px; border-radius: 2px; background: #00612a; }
 .spinner { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255, 255, 255, 0.4); border-top-color: #fff; border-radius: 50%; animation: spin 700ms linear infinite; }
 .busy .spinner { display: inline-block; }
 

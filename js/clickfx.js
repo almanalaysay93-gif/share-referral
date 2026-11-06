@@ -5,8 +5,10 @@
   'use strict';
   const A = window.anime;
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const SELECTOR = '.btn-primary, .btn-send, .btn-ghost, .stepnav a';
+  // Every button, every button-styled link, the step links and the logo link.
+  const SELECTOR = 'button, [role="button"], .btn-primary, .btn-send, .btn-ghost, .stepnav a, .brand, .seg label';
   let audio = null;
+  let lastFx = -1000;
 
   function chime() {
     try {
@@ -41,38 +43,51 @@
     host.className = 'burst';
     host.setAttribute('aria-hidden', 'true');
     host.style.transform = 'translate(' + x + 'px,' + y + 'px)';
-    const ring = document.createElement('i');
-    ring.className = 'is-ring';
-    host.appendChild(ring);
+    const rings = [0, 1].map((n) => {
+      const ring = document.createElement('i');
+      ring.className = 'is-ring' + (n ? ' is-sage' : '');
+      host.appendChild(ring);
+      return ring;
+    });
     const dots = [];
-    const count = 14;
+    const count = 32;
     for (let i = 0; i < count; i++) {
       const dot = document.createElement('i');
-      if (i % 3 === 0) dot.className = 'is-sage';
+      // Mix of green dots, sage dots and small sparks.
+      dot.className = i % 4 === 0 ? 'is-sage' : i % 5 === 0 ? 'is-spark' : '';
       host.appendChild(dot);
       dots.push(dot);
     }
     document.body.appendChild(host);
 
-    A.animate(ring, { scale: [0.4, 4.2], opacity: [0.9, 0], duration: 520, ease: 'out(3)' });
+    rings.forEach((ring, n) => {
+      A.animate(ring, { scale: [0.4, n ? 6 : 4.2], opacity: [0.9, 0], duration: n ? 760 : 520, delay: n * 60, ease: 'out(3)' });
+    });
     dots.forEach((dot, i) => {
-      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
-      const dist = 34 + Math.random() * 34;
+      // Two shells: an inner fast ring of particles and an outer slower one.
+      const outer = i % 2 === 1;
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+      const dist = (outer ? 60 : 30) + Math.random() * (outer ? 50 : 26);
       A.animate(dot, {
         x: [0, Math.cos(angle) * dist],
-        y: [0, Math.sin(angle) * dist + 10],
-        scale: [1, 0],
+        y: [0, Math.sin(angle) * dist + (outer ? 22 : 8)],
+        scale: [outer ? 0.8 : 1.15, 0],
         opacity: [1, 0],
-        duration: 560 + Math.random() * 220,
+        rotate: [0, (Math.random() - 0.5) * 360],
+        duration: (outer ? 760 : 520) + Math.random() * 240,
+        delay: outer ? 40 : 0,
         ease: 'out(3)',
       });
     });
-    setTimeout(() => host.remove(), 900);
+    setTimeout(() => host.remove(), 1200);
   }
 
   document.addEventListener('click', (event) => {
     const btn = event.target.closest(SELECTOR);
     if (!btn || btn.disabled) return;
+    // A click on a label also fires a click on its radio. Play the effect once.
+    if (event.timeStamp - lastFx < 60) return;
+    lastFx = event.timeStamp;
     const rect = btn.getBoundingClientRect();
     // Keyboard clicks have no pointer position: burst from the button centre.
     const x = event.detail ? event.clientX : rect.left + rect.width / 2;

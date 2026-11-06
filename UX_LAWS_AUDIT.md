@@ -201,3 +201,10 @@ Checks:
 - Lighthouse mobile on `read.html`: accessibility 100, best practices 100.
 - No console errors or warnings.
 - The chime was not heard in this test, because the browser test has no sound output.
+
+## Change on 2026-11-06: burst on every button, more particles
+
+- The click burst now runs on every button, every button-styled link, the step links, the logo link and the Yes / No / Unknown choices.
+- Each burst has 32 particles in two shells (a fast inner shell and a slower outer shell), green and sage dots plus small dark-green sparks, and two rings.
+- A label click also fires a click on its radio, so the effect is guarded to play once per click.
+- Check: a click on a Brain death choice made 1 burst with 34 pieces and still selected the radio. No console errors.

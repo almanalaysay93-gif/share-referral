@@ -145,7 +145,7 @@ test('team email carries the transcribed row and doctor gets a thank-you', () =>
   assert.match(thanks.htmlBody, /We received your referral/);
   assert.match(thanks.htmlBody, /Davao Doctors Hospital/);
   assert.ok(!thanks.htmlBody.includes('Today that doctor was you'));
-  assert.ok(thanks.htmlBody.includes('#status?ref=' + res.reference));
+  assert.ok(thanks.htmlBody.includes('https://example.org/referral/status.html?ref=' + res.reference));
 });
 
 test('no doctor email means no thank-you email', () => {

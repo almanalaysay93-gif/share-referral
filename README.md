@@ -7,12 +7,19 @@ Each referral goes into the `Master 2026` tab of the PMOD Referral Master 2026 G
 
 | Part | File | Job |
 |---|---|---|
-| Page | `index.html`, `css/styles.css`, `js/app.js` | Referral form, chat reader, status check |
-| Reader | `py/referral_parser.py`, `js/reader.js` | Offline Python that reads a pasted referral and fills the form |
+| Reader page | `index.html`, `js/reader-page.js` | Step 1: paste a referral, the offline reader finds the details |
+| Form page | `form.html`, `js/form-page.js` | Step 2: check the details and send the referral |
+| Status page | `status.html`, `js/status-page.js` | Step 3: show the status of a reference |
+| Shared | `css/styles.css`, `js/common.js` | Theme, server calls, reader-to-form draft, 3D parallax hero |
+| Reader | `py/referral_parser.py`, `js/reader.js` | Offline Python that reads a pasted referral |
 | Backend | `apps-script/Code.gs` | Writes the sheet row, sends the team email and the thank-you email |
 | Settings | `js/config.js` | Apps Script `/exec` address |
 
 ## Reader
+
+The reader page keeps what it found in `sessionStorage` for the open browser tab only.
+The form page reads that draft and clears it after a successful send.
+
 
 The reader is hard-coded Python with regular expressions and keyword tables.
 It uses no AI model and sends no text over the network.

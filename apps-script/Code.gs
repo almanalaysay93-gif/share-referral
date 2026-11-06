@@ -340,7 +340,7 @@ function sendTeamEmail_(input, saved) {
 function sendThankYou_(input, saved) {
   try {
     var site = PropertiesService.getScriptProperties().getProperty('SITE_URL') || '';
-    var statusLink = site ? site.replace(/#.*$/, '') + '#status?ref=' + encodeURIComponent(saved.reference) : '';
+    var statusLink = site ? site.replace(/#.*$/, '').replace(/[^/]*$/, '') + 'status.html?ref=' + encodeURIComponent(saved.reference) : '';
     var summary = [
       ['Reference', saved.reference], ['Patient', input.patient_name], ['Hospital', input.hospital],
       ['Ward / room', input.ward], ['GCS', input.gcs], ['Brain death declared', input.brain_death || 'Unknown'],

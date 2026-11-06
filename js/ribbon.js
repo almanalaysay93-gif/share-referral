@@ -54,16 +54,48 @@
     return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
   }
 
-  // Landing page: one long ribbon runs down the whole document. Scrolling draws it downward, and its
-  // tip leads at 70 percent of the screen height. A glowing head dot marks the tip.
+  // Landing page: two braided ribbons run down the whole document. Scrolling draws them downward, and
+  // the tip leads at 70 percent of the screen height. Particles ride along the drawn part and a glowing
+  // head dot marks the tip.
+  // group 0 sways one way, group 1 the opposite way, so the two ribbons cross like a braid.
+  const STRANDS = [
+    { group: 0, width: 64, color: 'url(#rb-sage)', opacity: 0.5, offset: -22, ripple: 0.012 },
+    { group: 0, width: 26, color: 'url(#rb-green)', opacity: 0.4, offset: 0, ripple: 0.014 },
+    { group: 0, width: 5, color: '#00612a', opacity: 0.5, offset: 22, ripple: 0.018 },
+    { group: 0, width: 2, color: '#008037', opacity: 0.45, offset: 44, ripple: 0.024 },
+    { group: 1, width: 38, color: 'url(#rb-sage)', opacity: 0.42, offset: -14, ripple: 0.016 },
+    { group: 1, width: 12, color: 'url(#rb-green)', opacity: 0.35, offset: 8, ripple: 0.02 },
+    { group: 1, width: 2, color: '#00612a', opacity: 0.4, offset: 26, ripple: 0.028 },
+  ];
+  const PARTICLES = 26;
+  const LONG_POINTS = 180;
+  const strandPaths = [];
+  const dots = [];
   const head = landing ? document.createElementNS(NS, 'circle') : null;
-  if (head) {
+  if (landing) {
+    paths.forEach((p) => p.remove());
+    STRANDS.forEach((strand) => {
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', strand.color);
+      p.setAttribute('stroke-width', strand.width);
+      p.setAttribute('stroke-linecap', 'round');
+      p.setAttribute('opacity', strand.opacity);
+      p.setAttribute('pathLength', '1');
+      svg.appendChild(p);
+      strandPaths.push(p);
+    });
+    for (let i = 0; i < PARTICLES; i++) {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('class', 'ribbon-dot' + (i % 3 === 0 ? ' is-sage' : ''));
+      svg.appendChild(c);
+      // Each particle has its own lane, speed, size and starting point along the ribbon.
+      dots.push({ el: c, lane: (i % 7) - 3, speed: 0.012 + (i % 5) * 0.004, size: 2.6 + (i % 4) * 1.3, seed: i / PARTICLES });
+    }
     head.setAttribute('r', '9');
     head.setAttribute('class', 'ribbon-head');
     svg.appendChild(head);
   }
-  const LONG_POINTS = 180;
-  if (landing) [64, 26, 5].forEach((width, i) => paths[i].setAttribute('stroke-width', width));
 
   function drawLanding() {
     const w = document.documentElement.clientWidth;
@@ -77,39 +109,53 @@
     const turns = Math.max(2, (endY - startY) / (window.innerHeight * 1.25));
     const tipY = still.matches ? endY : window.scrollY + window.innerHeight * 0.7;
     const swell = 1 + story.donor * 0.25;
-    let tip = null;
+    const centre = [[], []];
+    let tipFrac = 1;
 
-    paths.forEach((path, i) => {
-      const band = BANDS[i];
+    STRANDS.forEach((strand, i) => {
+      const dir = strand.group === 0 ? 1 : -1;
+      const amp = strand.group === 0 ? 0.34 : 0.27;
       const pts = [];
       let total = 0;
       let tipLen = 0;
-      let tipIndex = 0;
       for (let k = 0; k <= LONG_POINTS; k++) {
         const t = k / LONG_POINTS;
         const y = startY + t * (endY - startY);
-        // Starts behind the hero art on the right, then sways left and right on the way down.
-        // All strands share one sway so they read as one ribbon; each strand ripples a little on its own.
-        const sway = Math.sin(t * Math.PI * turns + Math.PI / 2 + phase * 0.22);
-        const ripple = Math.sin(t * Math.PI * turns * 3 + phase * band.speed * 5 + i) * 0.012;
-        const x = w * (0.5 + 0.34 * sway * swell + ripple) + (i - 1) * 22;
+        const sway = Math.sin(t * Math.PI * turns + Math.PI / 2 + phase * 0.22) * dir;
+        const ripple = Math.sin(t * Math.PI * turns * 3 + phase * (0.9 + i * 0.15) + i) * strand.ripple;
+        const x = w * (0.5 + amp * sway * swell + ripple) + strand.offset;
         if (k) {
-          const prev = pts[k - 1];
-          const seg = Math.hypot(x - prev[0], y - prev[1]);
-          total += seg;
-          if (y <= tipY) { tipLen = total; tipIndex = k; }
+          total += Math.hypot(x - pts[k - 1][0], y - pts[k - 1][1]);
+          if (y <= tipY) tipLen = total;
         }
         pts.push([x, y]);
       }
-      path.setAttribute('d', 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
+      strandPaths[i].setAttribute('d', 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
       const drawn = Math.min(1, Math.max(0.04, tipLen / total));
-      path.style.strokeDasharray = drawn.toFixed(4) + ' 1';
-      if (i === 1) tip = pts[tipIndex];
+      strandPaths[i].style.strokeDasharray = drawn.toFixed(4) + ' 1';
+      if (strand.offset === 0 || (strand.group === 1 && strand.offset === 8)) centre[strand.group] = pts;
     });
-    if (head && tip) {
-      head.setAttribute('cx', tip[0].toFixed(1));
-      head.setAttribute('cy', tip[1].toFixed(1));
-    }
+
+    // The tip: last centre point above the tip line.
+    const main = centre[0];
+    let tipIndex = 0;
+    for (let k = 0; k < main.length; k++) if (main[k][1] <= tipY) tipIndex = k;
+    tipFrac = tipIndex / LONG_POINTS;
+    head.setAttribute('cx', main[tipIndex][0].toFixed(1));
+    head.setAttribute('cy', main[tipIndex][1].toFixed(1));
+
+    // Particles stream down the drawn part of either ribbon and fade at both ends.
+    dots.forEach((d, i) => {
+      const lane = centre[i % 2];
+      const along = ((d.seed + phase * d.speed) % 1) * tipFrac;
+      const k = Math.min(LONG_POINTS, Math.round(along * LONG_POINTS));
+      const p = lane[k];
+      const fade = tipFrac > 0 ? Math.min(1, along / 0.03, (tipFrac - along) / 0.06) : 0;
+      d.el.setAttribute('cx', (p[0] + d.lane * 9 + Math.sin(phase * 2 + i) * 6).toFixed(1));
+      d.el.setAttribute('cy', p[1].toFixed(1));
+      d.el.setAttribute('r', d.size.toFixed(1));
+      d.el.setAttribute('opacity', Math.max(0, fade * 0.85).toFixed(2));
+    });
   }
 
   function draw(now) {

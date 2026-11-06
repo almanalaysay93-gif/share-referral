@@ -60,7 +60,51 @@
   if (document.body.classList.contains('page-landing')) {
     landingTitle(title);
     chipsAndCounts();
+    sectionTitles();
     return;
+  }
+
+  // Landing section headings: letters rise on a spring when the heading scrolls into view, the small
+  // kicker above settles from wide letter spacing, then a green sheen runs once through the words.
+  function sectionTitles() {
+    const heads = Array.from(document.querySelectorAll('main section:not(.hero) h2'));
+    if (!heads.length || !('IntersectionObserver' in window)) return;
+    const splits = new Map();
+    heads.forEach((h) => {
+      const split = splitText(h, { words: { wrap: 'clip' }, chars: true });
+      split.chars.forEach((c) => { c.style.opacity = '0'; });
+      splits.set(h, split);
+    });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        io.unobserve(entry.target);
+        play(entry.target, splits.get(entry.target));
+      });
+    }, { threshold: 0.4 });
+    heads.forEach((h) => io.observe(h));
+
+    function play(h, split) {
+      const kicker = h.previousElementSibling && h.previousElementSibling.classList.contains('kicker')
+        ? h.previousElementSibling : null;
+      const tl = A.createTimeline();
+      if (kicker) {
+        tl.add(kicker, { letterSpacing: ['0.42em', '0.12em'], opacity: [0, 1], duration: 700, ease: 'out(4)' });
+      }
+      tl.add(split.chars, {
+        y: ['105%', '0%'],
+        rotate: [10, 0],
+        opacity: [0, 1],
+        ease: A.spring({ bounce: 0.28, duration: 680 }),
+        delay: stagger(16),
+      }, kicker ? '-=520' : 0);
+      tl.add(split.words, {
+        color: ['#0d3b21', '#008037', '#0d3b21'],
+        duration: 900,
+        ease: 'inOut(2)',
+        delay: stagger(70),
+      }, '-=200');
+    }
   }
 
   const split = splitText(title, { words: { wrap: 'clip' }, chars: true });

@@ -169,3 +169,17 @@ Checks:
 - About 101 frames per second, slowest frame 10 ms, on this PC.
 - At 390 x 844 with the CPU slowed 4 times: about 88 frames per second, slowest frame 20 ms, and no horizontal overflow.
 - No console errors or warnings.
+
+## Change on 2026-11-06: braided ribbons, particles and section titles
+
+- The landing ribbon is now two braided ribbons with seven strands. One ribbon sways left while the other sways right, so they cross on the way down.
+- 26 glowing particles stream down the drawn part of the ribbons and fade at both ends.
+- Each landing section heading (transcription, donor, how it works, final call) animates with Anime.js when it scrolls into view: the kicker settles from wide letter spacing, the letters rise on a spring with a stagger, then a green sheen runs once through the words.
+- Reduced motion: headings are not split or hidden, particles and the head dot are hidden, and the ribbons show still and in full.
+
+Checks:
+
+- Chrome at 1440 x 900: 7 strands and 26 particles rendered, all particles visible on the drawn part, and the demo heading went from opacity 0 to 1 within 1.8 s of scrolling in.
+- About 100 frames per second, slowest frame 20 ms, on this PC.
+- At 390 x 844 with the CPU slowed 4 times: about 49 frames per second, slowest frame 30 ms, no horizontal overflow.
+- No console errors or warnings.

@@ -154,3 +154,18 @@ Checks:
 - At 390 x 844 there was no horizontal overflow.
 - Lighthouse mobile on the landing page: accessibility 100, best practices 100.
 - No console errors or warnings.
+
+## Change on 2026-11-06: ribbon flows down the landing page
+
+- On the landing page the ribbon is one long SVG ribbon that runs down the whole document, from behind the hero heart to the final call to action.
+- Scrolling draws it downward. Its tip leads at 70 percent of the screen height, and a glowing green head dot marks the tip.
+- The three strands sway together as one ribbon and ripple a little on their own. The donor map widens the sway.
+- The Read, Send and Status pages keep the faint fixed ribbon.
+- Reduced motion: the whole ribbon shows, still, with no head dot.
+
+Checks:
+
+- Chrome at 1440 x 900: the drawn length was 9, 36, 62 and 93 percent at 0, 30, 60 and 95 percent of the page scroll, and the head dot sat 10 to 16 px above the target tip line each time.
+- About 101 frames per second, slowest frame 10 ms, on this PC.
+- At 390 x 844 with the CPU slowed 4 times: about 88 frames per second, slowest frame 20 ms, and no horizontal overflow.
+- No console errors or warnings.

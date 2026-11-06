@@ -54,7 +54,76 @@
     return max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
   }
 
+  // Landing page: one long ribbon runs down the whole document. Scrolling draws it downward, and its
+  // tip leads at 70 percent of the screen height. A glowing head dot marks the tip.
+  const head = landing ? document.createElementNS(NS, 'circle') : null;
+  if (head) {
+    head.setAttribute('r', '9');
+    head.setAttribute('class', 'ribbon-head');
+    svg.appendChild(head);
+  }
+  const LONG_POINTS = 180;
+  if (landing) [64, 26, 5].forEach((width, i) => paths[i].setAttribute('stroke-width', width));
+
+  function drawLanding() {
+    const w = document.documentElement.clientWidth;
+    const docH = document.documentElement.scrollHeight;
+    const footer = document.querySelector('.footer');
+    const endY = docH - (footer ? footer.offsetHeight : 0) - 40;
+    const startY = 90;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + docH);
+    svg.style.height = docH + 'px';
+    const story = window.SHARE_STORY || { demo: 0, donor: 0 };
+    const turns = Math.max(2, (endY - startY) / (window.innerHeight * 1.25));
+    const tipY = still.matches ? endY : window.scrollY + window.innerHeight * 0.7;
+    const swell = 1 + story.donor * 0.25;
+    let tip = null;
+
+    paths.forEach((path, i) => {
+      const band = BANDS[i];
+      const pts = [];
+      let total = 0;
+      let tipLen = 0;
+      let tipIndex = 0;
+      for (let k = 0; k <= LONG_POINTS; k++) {
+        const t = k / LONG_POINTS;
+        const y = startY + t * (endY - startY);
+        // Starts behind the hero art on the right, then sways left and right on the way down.
+        // All strands share one sway so they read as one ribbon; each strand ripples a little on its own.
+        const sway = Math.sin(t * Math.PI * turns + Math.PI / 2 + phase * 0.22);
+        const ripple = Math.sin(t * Math.PI * turns * 3 + phase * band.speed * 5 + i) * 0.012;
+        const x = w * (0.5 + 0.34 * sway * swell + ripple) + (i - 1) * 22;
+        if (k) {
+          const prev = pts[k - 1];
+          const seg = Math.hypot(x - prev[0], y - prev[1]);
+          total += seg;
+          if (y <= tipY) { tipLen = total; tipIndex = k; }
+        }
+        pts.push([x, y]);
+      }
+      path.setAttribute('d', 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
+      const drawn = Math.min(1, Math.max(0.04, tipLen / total));
+      path.style.strokeDasharray = drawn.toFixed(4) + ' 1';
+      if (i === 1) tip = pts[tipIndex];
+    });
+    if (head && tip) {
+      head.setAttribute('cx', tip[0].toFixed(1));
+      head.setAttribute('cy', tip[1].toFixed(1));
+    }
+  }
+
   function draw(now) {
+    if (landing) {
+      drawLanding();
+      if (!still.matches && running) {
+        phase += Math.min(64, now - last) / 1000;
+        last = now;
+        frame = requestAnimationFrame(draw);
+      } else {
+        frame = 0;
+      }
+      return;
+    }
     const w = window.innerWidth;
     const h = window.innerHeight;
     svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);

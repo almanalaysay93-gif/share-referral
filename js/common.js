@@ -47,6 +47,16 @@
     return new Promise((resolve) => setTimeout(() => {
       const store = demoStore();
       const now = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' });
+      if (body.action === 'find') {
+        const refs = Object.keys(store).map((ref) => ({ reference: ref, hospital: 'Preview', submittedAt: store[ref], status: 'Received' }));
+        resolve(refs.length ? { ok: true, identifiedBy: 'reference', referrals: refs.slice(-10).reverse() }
+          : { ok: false, error: 'No preview referrals in this browser yet.' });
+        return;
+      }
+      if (body.action === 'update') {
+        resolve({ ok: true, reference: body.reference, status: 'Under review', changes: 1, doctorEmail: 'No email on file' });
+        return;
+      }
       if (body.action === 'status') {
         const row = store[body.reference];
         resolve(row ? { ok: true, reference: body.reference, status: 'Received', submittedAt: row, updatedAt: row }

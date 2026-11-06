@@ -11,6 +11,7 @@ Each referral goes into the `Master 2026` tab of the PMOD Referral Master 2026 G
 | Reader page | `read.html`, `js/reader-page.js` | Step 1: paste a referral, the offline reader finds the details |
 | Form page | `form.html`, `js/form-page.js` | Step 2: check the details and send the referral |
 | Status page | `status.html`, `js/status-page.js` | Step 3: show the status of a reference |
+| Update page | `update.html`, `js/update-page.js` | Step 4: find a referral by reference, PRC or email and send changes |
 | Shared | `css/styles.css`, `js/common.js` | Theme, server calls, reader-to-form draft, 3D parallax hero |
 | Reader | `py/referral_parser.py`, `js/reader.js` | Offline Python that reads a pasted referral |
 | Backend | `apps-script/Code.gs` | Writes the sheet row, sends the team email and the thank-you email |
@@ -40,6 +41,14 @@ echo "Pt: Juan Dela Cruz, 45/M, ICU 3" | python py/referral_parser.py
 - Hospital, ventilator status, contact number, the web reference and the pasted text go into `Case notes`.
 - The `Web Referrals` tab holds the reference, the doctor and the status.
 - Change the status in column `K` of `Web Referrals`. The `Status updated` time fills in by itself.
+
+## Updates
+
+- A doctor finds a referral by its reference, PRC number or email. The page shows only the reference, hospital, date and status.
+- The update can change Ward (K), GCS (M), Hospital outcome (O, set to `Expired`), Hospital end date (H), Brain death (P, Q) and DNR decision (S, set to `Yes`).
+- Every update is added with a date to Case notes (Y), logged in the `Referral Updates` tab, and emailed to the team with old and new values.
+- A confirmation goes to the doctor email saved with the referral.
+- A `Received` status changes to `Under review`.
 
 ## Emails
 

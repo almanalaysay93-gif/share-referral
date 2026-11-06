@@ -18,7 +18,30 @@ FIELDS = [
     "patient_name", "hrn", "age", "sex", "hospital", "ward", "admission_date",
     "gcs", "diagnosis", "brain_death", "brain_death_datetime", "ventilator",
     "doctor_name", "prc", "doctor_email", "contact_number", "notes",
+    "expired", "expired_datetime", "dnr",
 ]
+
+EXPIRED_RE = re.compile(
+    r"\b(?:expired|died|passed\s+away|pronounced\s+dead|time\s+of\s+death|t\.?o\.?d\.?\s*[:=]|"
+    r"declared\s+dead)\b",
+    re.I,
+)
+DNR_NO_RE = re.compile(r"\b(?:not\s+(?:for\s+)?dnr|no\s+dnr|refused\s+dnr|full\s+code)\b", re.I)
+DNR_RE = re.compile(r"\b(?:dnr|do[\s-]+not[\s-]+resuscitate|no[\s-]+code|dnr\s+waiver)\b", re.I)
+
+
+def _expired_from_text(text, today=None):
+    """'Patient expired 11/08/2026 9:30 AM' -> ('Yes', '2026-11-08T09:30'). Brain death alone is not expiry."""
+    match = EXPIRED_RE.search(text)
+    if not match:
+        return "", ""
+    return "Yes", parse_datetime(text[match.end():match.end() + 60], today)
+
+
+def _dnr_from_text(text):
+    if DNR_NO_RE.search(text):
+        return "No"
+    return "Yes" if DNR_RE.search(text) else ""
 
 REQUIRED = ["patient_name", "hospital", "doctor_name"]
 
@@ -590,6 +613,9 @@ def parse_referral(text, today=None):
     fields["doctor_email"] = email_match.group(0).lower() if email_match else ""
 
     fields["contact_number"] = _normalize_phone(labelled.get("contact_number", "")) or _normalize_phone(text)
+    fields["expired"], fields["expired_datetime"] = _expired_from_text(text, today)
+    fields["dnr"] = _dnr_from_text(text)
+
     clinical = _clinical_notes(text)
     fields["notes"] = "\n".join(part for part in (labelled.get("notes", ""), clinical) if part)[:2000]
 

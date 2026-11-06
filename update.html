@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Update a referral · SHARE</title>
+  <meta name="description" content="Update a brain death referral you sent to SHARE." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#008037" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wdth,wght@62..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=16" />
+  <link rel="preload" as="image" href="assets/art/lungs.webp" />
+  <script src="js/config.js?v=7"></script>
+  <script>if (!window.SHARE_CONFIG.ENDPOINT) document.documentElement.classList.add('is-demo');</script>
+</head>
+<body class="page-update">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 -960 960 960"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></symbol>
+    <symbol id="i-send" viewBox="0 -960 960 960"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></symbol>
+    <symbol id="i-check" viewBox="0 -960 960 960"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#identity">Skip to the search box</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./" aria-label="SHARE referral, home page">
+        <img src="assets/share_logo.webp" width="44" height="44" alt="SHARE logo" />
+        <img src="assets/spmc_logo.webp" width="33" height="44" alt="Southern Philippines Medical Center logo" />
+        <span class="brand-text"><b>SHARE</b><small>Brain death referral</small></span>
+      </a>
+      <nav class="stepnav" aria-label="Referral steps">
+        <a href="read.html"><b>1</b><span>Read</span></a>
+        <a href="form.html"><b>2</b><span>Send</span></a>
+        <a href="status.html"><b>3</b><span>Status</span></a>
+        <a href="update.html" aria-current="page"><b>4</b><span>Update</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" data-hero aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="kicker">Step 4 · Update a referral</p>
+          <h1 id="hero-title">Something changed? Tell SHARE.</h1>
+          <p class="lede">Brain death declared, a new GCS, the patient expired, or the family chose DNR. Find your referral, then paste or pick what changed. The coordinator on duty gets it by email at once.</p>
+          <p class="demo-banner">Preview mode: no update leaves this browser.</p>
+        </div>
+        <div class="stage" aria-hidden="true">
+          <div class="scene">
+            <span class="layer plane"></span>
+            <span class="layer ring"></span>
+            <span class="layer numeral">04</span>
+            <svg class="layer pulse" viewBox="0 0 400 80"><path pathLength="1000" d="M0 50 H120 L135 50 L150 18 L165 72 L180 8 L195 50 H260 L272 50 L282 34 L292 50 H400"/></svg>
+            <span class="layer orbit"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <img class="layer organ" src="assets/art/lungs.webp" width="320" height="320" alt="" />
+            <span class="layer glass chip-1"><b class="dot-ok"></b><span>Lungs: end-stage lung disease</span></span>
+            <span class="layer glass chip-2"><b class="dot-ok"></b><span>Timely updates keep <strong data-count="8">8</strong> lives in reach</span></span>
+            <span class="layer glass chip-3"><b class="dot-wait"></b><span>Every change goes to the coordinator</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace wrap update-wrap" aria-label="Update a referral">
+      <div class="panel update-panel">
+        <h2 class="update-h">1. Find your referral</h2>
+        <form class="status-form" id="find-form" novalidate>
+          <label class="sr-only" for="identity">Reference, PRC number or email</label>
+          <input id="identity" placeholder="SHR-7K3Q9X, PRC number or email" autocomplete="off" maxlength="120" />
+          <button type="submit" class="btn-primary" id="find-btn">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span>Find</span>
+          </button>
+        </form>
+        <p class="panel-sub find-help">Use the reference from your thank-you email, or the PRC number or email you gave when you referred. Patient details are never shown here.</p>
+        <div id="find-result" aria-live="polite"></div>
+      </div>
+
+      <div class="panel update-panel" id="update-step" hidden>
+        <h2 class="update-h">2. What changed? <span class="for-ref" id="for-ref"></span></h2>
+
+        <div class="paste-update">
+          <label for="update-paste">Paste the update the way you send it <span class="opt">optional, the offline reader picks out the changes</span></label>
+          <textarea id="update-paste" rows="4" placeholder="Update: declared brain dead 11/07/2026 2:00 PM, apnea test positive.&#10;GCS 3, still on MV. Family opted for DNR."></textarea>
+          <div class="composer-row">
+            <span class="panel-sub" id="read-state">Offline reader. No AI.</span>
+            <button type="button" class="btn-send" id="read-update"><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg><span>Read</span></button>
+          </div>
+        </div>
+
+        <form id="update-form" novalidate>
+          <div class="hp" aria-hidden="true"><label for="u-website">Website</label><input id="u-website" name="website" tabindex="-1" autocomplete="off" /></div>
+          <div class="grid">
+            <div class="field span-2">
+              <span class="label" id="l-u-bd">Brain death</span>
+              <div class="seg" role="radiogroup" aria-labelledby="l-u-bd">
+                <label><input type="radio" name="brain_death" value="" checked /><span>No change</span></label>
+                <label><input type="radio" name="brain_death" value="Yes" /><span>Declared</span></label>
+                <label><input type="radio" name="brain_death" value="No" /><span>Not yet</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="u-bd-time">Date and time declared</label>
+              <input id="u-bd-time" name="brain_death_datetime" type="datetime-local" />
+            </div>
+            <div class="field">
+              <label for="u-gcs">GCS now</label>
+              <select id="u-gcs" name="gcs">
+                <option value="">No change</option>
+                <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+                <option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+                <option>13</option><option>14</option><option>15</option>
+              </select>
+            </div>
+            <div class="field">
+              <span class="label" id="l-u-vent">On ventilator</span>
+              <div class="seg" role="radiogroup" aria-labelledby="l-u-vent">
+                <label><input type="radio" name="ventilator" value="" checked /><span>No change</span></label>
+                <label><input type="radio" name="ventilator" value="Yes" /><span>Yes</span></label>
+                <label><input type="radio" name="ventilator" value="No" /><span>No</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="u-ward">Ward / room now</label>
+              <input id="u-ward" name="ward" maxlength="120" placeholder="No change" />
+            </div>
+            <div class="field span-2 checks">
+              <label class="check"><input type="checkbox" name="expired" id="u-expired" /><span>Patient has expired</span></label>
+              <label class="check"><input type="checkbox" name="dnr" id="u-dnr" /><span>Family opted for DNR</span></label>
+            </div>
+            <div class="field span-2" id="expired-time-field" hidden>
+              <label for="u-expired-time">Date and time of death</label>
+              <input id="u-expired-time" name="expired_datetime" type="datetime-local" />
+            </div>
+            <div class="field span-2">
+              <label for="u-note">Update note for the coordinator</label>
+              <textarea id="u-note" name="note" rows="3" maxlength="2000" placeholder="For example: apnea test done, family informed, coordinator may come at 3 PM."></textarea>
+            </div>
+          </div>
+          <div class="form-foot">
+            <p class="form-msg" id="update-msg" role="alert"></p>
+            <button type="submit" class="btn-primary" id="update-btn"><span class="btn-label">Send update</span><span class="spinner" aria-hidden="true"></span></button>
+          </div>
+        </form>
+
+        <div class="success" id="update-success" hidden tabindex="-1">
+          <svg class="icon success-icon" aria-hidden="true"><use href="#i-check"/></svg>
+          <h2>Update sent. Thank you.</h2>
+          <p>The SHARE coordinator on duty has your update for <b id="ok-ref"></b>.</p>
+          <p class="ok-mail" id="ok-mail"></p>
+          <div class="success-actions">
+            <a class="btn-ghost" id="ok-status" href="status.html">Check status</a>
+            <a class="btn-primary" href="update.html">Update another referral</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p><b>SHARE</b> &middot; Southern Philippines Medical Center Human Advocate and Retrieval Effort, Davao City.</p>
+      <p>Patient details go only to the SHARE referral sheet and the SHARE team's email. The page is not indexed by search engines.</p>
+    </div>
+  </footer>
+
+  <script src="js/vendor/anime.umd.min.js?v=4.5.0"></script>
+  <script src="js/common.js?v=3"></script>
+  <script src="js/ribbon.js?v=6"></script>
+  <script src="js/motion.js?v=6"></script>
+  <script src="js/clickfx.js?v=3"></script>
+  <script src="js/reader.js?v=1"></script>
+  <script src="js/update-page.js?v=2"></script>
+</body>
+</html>

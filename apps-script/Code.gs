@@ -46,6 +46,8 @@ function doPost(e) {
   try {
     if (body.action === 'status') return json_(checkStatus_(body));
     if (body.action === 'submit') return json_(submitReferral_(body));
+    if (body.action === 'find') return json_(findReferrals_(body));
+    if (body.action === 'update') return json_(updateReferral_(body));
     return json_({ ok: false, error: 'Unknown action.' });
   } catch (err) {
     console.error(err && err.stack ? err.stack : err);
@@ -261,6 +263,232 @@ function checkStatus_(body) {
     }
   }
   return { ok: false, error: 'Reference not found.' };
+}
+
+/* ---------- Update ---------- */
+
+var UPDATES_TAB = 'Referral Updates';
+var UPDATE_HEADERS = ['Time', 'Reference', 'Admission ID', 'Identified by', 'Changes', 'Note', 'Team email', 'Doctor email'];
+
+/** What the doctor typed to find a referral: a reference, a PRC number or an email address. */
+function identityKind_(value) {
+  var v = String(value || '').trim();
+  if (/^SHR-[A-Z0-9]{6}$/i.test(v)) return { kind: 'reference', value: v.toUpperCase() };
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return { kind: 'email', value: v.toLowerCase() };
+  var digits = v.replace(/\D/g, '');
+  if (/^\d{5,8}$/.test(digits) && /^[\d\s-]+$/.test(v)) return { kind: 'PRC', value: digits };
+  return null;
+}
+
+function rowMatches_(row, id) {
+  if (id.kind === 'reference') return String(row[0]).toUpperCase() === id.value;
+  if (id.kind === 'email') return String(row[7]).trim().toLowerCase() === id.value;
+  return String(row[6]).replace(/\D/g, '') === id.value;
+}
+
+/** Referrals that match a reference, PRC or email. Returns no patient details. */
+function findReferrals_(body) {
+  var id = identityKind_(body.identity);
+  if (!id) return { ok: false, error: 'Enter a reference (SHR-7K3Q9X), your PRC number or your email.' };
+  var web = webSheet_(book_());
+  var last = web.getLastRow();
+  var found = [];
+  if (last >= 2) {
+    web.getRange(2, 1, last - 1, 12).getValues().forEach(function (row) {
+      if (row[0] && rowMatches_(row, id)) {
+        found.push({ reference: String(row[0]), hospital: String(row[4]), submittedAt: fmt_(row[1]),
+          status: row[10] || STATUSES[0], when: row[1] instanceof Date ? row[1].getTime() : 0 });
+      }
+    });
+  }
+  found.sort(function (a, b) { return b.when - a.when; });
+  found = found.slice(0, 10).map(function (f) { delete f.when; return f; });
+  if (!found.length) return { ok: false, error: 'No referral matches that ' + (id.kind === 'reference' ? 'reference' : id.kind) + '.' };
+  return { ok: true, identifiedBy: id.kind, referrals: found };
+}
+
+function cleanUpdate_(raw) {
+  var c = {};
+  var text = function (key, max) { return raw[key] == null ? '' : String(raw[key]).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max); };
+  c.ward = text('ward', 120);
+  c.gcs = text('gcs', 2);
+  c.ventilator = text('ventilator', 10);
+  c.brain_death = text('brain_death', 10);
+  c.brain_death_datetime = text('brain_death_datetime', 20);
+  c.expired = raw.expired === true || raw.expired === 'Yes';
+  c.expired_datetime = text('expired_datetime', 20);
+  c.dnr = raw.dnr === true || raw.dnr === 'Yes';
+  c.note = text('note', 2000);
+  c.raw_text = text('raw_text', 20000);
+  return c;
+}
+
+function validateUpdate_(c) {
+  var errors = [];
+  if (c.gcs && !(/^\d{1,2}$/.test(c.gcs) && Number(c.gcs) >= 3 && Number(c.gcs) <= 15)) errors.push('gcs');
+  if (c.ventilator && ['Yes', 'No', 'Unknown'].indexOf(c.ventilator) < 0) errors.push('ventilator');
+  if (c.brain_death && ['Yes', 'No', 'Unknown'].indexOf(c.brain_death) < 0) errors.push('brain_death');
+  if (c.brain_death_datetime && !parseDate_(c.brain_death_datetime)) errors.push('brain_death_datetime');
+  if (c.expired_datetime && !parseDate_(c.expired_datetime)) errors.push('expired_datetime');
+  var any = c.ward || c.gcs || c.ventilator || c.brain_death || c.brain_death_datetime || c.expired || c.dnr || c.note || c.raw_text;
+  if (!any) errors.push('nothing');
+  return errors;
+}
+
+function updatesSheet_(book) {
+  var sheet = book.getSheetByName(UPDATES_TAB);
+  if (!sheet) {
+    sheet = book.insertSheet(UPDATES_TAB);
+    sheet.getRange(1, 1, 1, UPDATE_HEADERS.length).setValues([UPDATE_HEADERS]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function updateReferral_(body) {
+  if (body.website) return { ok: true }; // honeypot
+  var ref = String(body.reference || '').trim().toUpperCase();
+  var id = identityKind_(body.identity);
+  if (!/^SHR-[A-Z0-9]{6}$/.test(ref) || !id) return { ok: false, error: 'Find your referral first.' };
+  var c = cleanUpdate_(body.update || {});
+  var errors = validateUpdate_(c);
+  if (errors.indexOf('nothing') >= 0) return { ok: false, error: 'Add at least one change or a note.', fields: ['nothing'] };
+  if (errors.length) return { ok: false, error: 'Please check the highlighted fields.', fields: errors };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  var result;
+  try {
+    var book = book_();
+    var web = webSheet_(book);
+    var last = web.getLastRow();
+    var rows = last >= 2 ? web.getRange(2, 1, last - 1, 14).getValues() : [];
+    var webIndex = -1;
+    for (var i = 0; i < rows.length; i++) if (String(rows[i][0]).toUpperCase() === ref) webIndex = i;
+    // The reference must exist and the identity must belong to that same referral.
+    if (webIndex < 0 || !rowMatches_(rows[webIndex], id)) {
+      return { ok: false, error: 'That reference does not match the PRC number or email you used.' };
+    }
+    var webRow = rows[webIndex];
+    var webRowNumber = webIndex + 2;
+    var admissionId = String(webRow[2]);
+
+    var master = book.getSheetByName(MASTER_TAB);
+    var mLast = master.getLastRow();
+    var ids = master.getRange(2, 1, mLast - 1, 1).getValues();
+    var mRow = -1;
+    for (var k = 0; k < ids.length; k++) if (String(ids[k][0]).trim() === admissionId) mRow = k + 2;
+    if (mRow < 0) return { ok: false, error: 'The SHARE sheet row for this referral was moved. Please call the SHARE team.' };
+
+    var now = new Date();
+    var current = master.getRange(mRow, 1, 1, 25).getValues()[0];
+    var changes = [];
+    var write = function (col, label, value, shown) {
+      var before = current[col - 1];
+      master.getRange(mRow, col).setValue(value);
+      changes.push([label, fmt_(before) || '(blank)', shown == null ? fmt_(value) : shown]);
+    };
+    if (c.ward) write(11, 'Ward / room (K)', c.ward);
+    if (c.gcs) write(13, 'GCS (M)', Number(c.gcs), c.gcs);
+    if (c.brain_death) write(16, 'Brain death declared (P)', c.brain_death);
+    if (c.brain_death_datetime) write(17, 'Brain death date / time (Q)', parseDate_(c.brain_death_datetime));
+    if (c.expired) {
+      write(15, 'Hospital outcome (O)', 'Expired');
+      if (c.expired_datetime) write(8, 'Hospital end date (H)', parseDate_(c.expired_datetime));
+    }
+    if (c.dnr) write(19, 'DNR decision (S)', 'Yes');
+    if (c.ventilator) changes.push(['On ventilator', '', c.ventilator]);
+
+    var stamp = Utilities.formatDate(now, TIMEZONE, 'dd MMM yyyy HH:mm');
+    var lines = ['Update ' + stamp + ' (web, identified by ' + id.kind + ')'];
+    changes.forEach(function (ch) { lines.push(ch[0] + ': ' + ch[2]); });
+    if (c.note) lines.push('Note: ' + c.note);
+    if (c.raw_text) lines.push('Pasted update: ' + c.raw_text);
+    var notes = String(current[24] || '');
+    master.getRange(mRow, 25).setValue((notes ? notes + '\n\n' : '') + lines.join('\n'));
+
+    var status = webRow[10] || STATUSES[0];
+    if (status === STATUSES[0]) {
+      status = STATUSES[1];
+      web.getRange(webRowNumber, 11).setValue(status);
+    }
+    web.getRange(webRowNumber, 12).setValue(now);
+
+    var log = updatesSheet_(book);
+    log.appendRow([now, ref, admissionId, id.kind,
+      changes.map(function (ch) { return ch[0] + ': ' + ch[1] + ' -> ' + ch[2]; }).join('\n'), c.note, '', '']);
+    var logRow = log.getLastRow();
+    SpreadsheetApp.flush();
+    result = {
+      ref: ref, admissionId: admissionId, status: status, changes: changes, now: now, logRow: logRow,
+      hospital: String(webRow[4]), doctorName: String(webRow[5]), doctorEmail: String(webRow[7] || '')
+    };
+  } finally {
+    lock.releaseLock();
+  }
+
+  var team = sendUpdateTeamEmail_(c, result);
+  var doctor = '';
+  if (result.doctorEmail) doctor = sendUpdateDoctorEmail_(c, result) ? 'Sent' : 'Failed';
+  var log2 = updatesSheet_(book_());
+  log2.getRange(result.logRow, 7, 1, 2).setValues([[team ? 'Sent' : 'Failed', doctor || 'No email on file']]);
+
+  return { ok: true, reference: result.ref, status: result.status, changes: result.changes.length,
+    doctorEmail: doctor || 'No email on file' };
+}
+
+function updateSections_(c) {
+  var head = 'margin:18px 0 6px;font-weight:bold;color:#0d3b21';
+  var box = 'margin:0;padding:12px 14px;background:#ffffff;border:1px solid #d9e2cf;border-radius:10px;' +
+    'white-space:pre-wrap;word-break:break-word;font:13px/1.5 Consolas,Menlo,monospace;color:#16261b';
+  var html = '', text = '';
+  if (c.note) { html += '<p style="' + head + '">Update note</p><pre style="' + box + '">' + esc_(c.note) + '</pre>'; text += '\n\nUpdate note\n' + c.note; }
+  if (c.raw_text) { html += '<p style="' + head + '">Update as sent</p><pre style="' + box + '">' + esc_(c.raw_text) + '</pre>'; text += '\n\nUpdate as sent\n' + c.raw_text; }
+  return { html: html, text: text };
+}
+
+function sendUpdateTeamEmail_(c, r) {
+  try {
+    var flag = c.expired ? 'PATIENT EXPIRED' : c.brain_death === 'Yes' ? 'BRAIN DEATH DECLARED' : 'Referral update';
+    var rows = [['Reference', r.ref], ['Admission ID', r.admissionId], ['Hospital', r.hospital], ['Status', r.status]];
+    var changeRows = r.changes.map(function (ch) { return [ch[0], ch[1] + '  →  ' + ch[2]]; });
+    var extra = updateSections_(c);
+    var html = '<div style="font:14px Arial,sans-serif;color:#16261b;max-width:680px">' +
+      '<h2 style="color:#008037;margin:0 0 6px">Referral updated by the referring doctor</h2>' +
+      '<p style="margin:0 0 14px">Received ' + esc_(fmt_(r.now)) + '. The sheet row was changed as shown below.</p>' +
+      table_(rows) + (changeRows.length ? '<p style="margin:18px 0 6px;font-weight:bold;color:#0d3b21">Changes (old → new)</p>' + table_(changeRows) : '') +
+      extra.html + '</div>';
+    var text = 'Referral ' + r.ref + ' (' + r.admissionId + ') updated ' + fmt_(r.now) + '.\n\n' +
+      changeRows.map(function (x) { return x[0] + ': ' + x[1]; }).join('\n') + extra.text;
+    MailApp.sendEmail({ to: alertEmails_(), subject: '[SHARE referral] UPDATE - ' + flag + ' - ' + r.hospital + ' - ' + r.admissionId,
+      body: text, htmlBody: html, name: 'SHARE Referral Portal' });
+    return true;
+  } catch (err) {
+    console.error('Update team email failed: ' + err);
+    return false;
+  }
+}
+
+function sendUpdateDoctorEmail_(c, r) {
+  try {
+    var changeRows = r.changes.map(function (ch) { return [ch[0], ch[2]]; });
+    var extra = updateSections_(c);
+    var html = '<div style="font:15px Arial,sans-serif;color:#16261b;max-width:600px;line-height:1.55">' +
+      '<div style="background:#008037;color:#fff;padding:22px 24px;border-radius:14px 14px 0 0">' +
+      '<div style="font-size:24px;font-weight:bold">Thank you, ' + esc_(r.doctorName) + '.</div></div>' +
+      '<div style="background:#f4f8ef;padding:22px 24px;border-radius:0 0 14px 14px">' +
+      '<p style="margin:0 0 12px"><b>We received your update to referral ' + esc_(r.ref) + '.</b> The SHARE coordinator has been told.</p>' +
+      (changeRows.length ? table_(changeRows) : '') + extra.html +
+      '<p style="margin:16px 0 0">With gratitude,<br><b>The SHARE Team</b></p></div></div>';
+    var text = 'Thank you, ' + r.doctorName + '.\n\nWe received your update to referral ' + r.ref + '.\n\n' +
+      changeRows.map(function (x) { return x[0] + ': ' + x[1]; }).join('\n') + extra.text + '\n\nThe SHARE Team';
+    MailApp.sendEmail({ to: r.doctorEmail, subject: 'Update received (' + r.ref + ')', body: text, htmlBody: html,
+      name: 'SHARE Team', replyTo: 'share@spmcdvo.net' });
+    return true;
+  } catch (err) {
+    console.error('Update doctor email failed: ' + err);
+    return false;
+  }
 }
 
 /** Simple trigger: stamp "Status updated" when the team changes a status. */

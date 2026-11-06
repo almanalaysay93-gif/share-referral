@@ -31,6 +31,9 @@
       card.appendChild(list);
     }
     card.appendChild(el('p', 'status-meta', 'Received ' + res.submittedAt + '. Last update ' + res.updatedAt + '.'));
+    const update = el('a', 'btn-ghost status-update', 'Something changed? Update this referral');
+    update.href = 'update.html?ref=' + encodeURIComponent(res.reference);
+    card.appendChild(update);
     box.appendChild(card);
   }
 

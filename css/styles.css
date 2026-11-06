@@ -404,3 +404,27 @@ main, .footer { position: relative; z-index: 1; }
 .hl-line { position: absolute; left: -2%; bottom: -0.14em; width: 104%; height: 0.34em; overflow: visible; pointer-events: none; }
 .hl-line path { fill: none; stroke: var(--green); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
 .hl-num { display: inline-block; transform-origin: 50% 60%; }
+
+/* Update page */
+.update-wrap { max-width: 900px; }
+.update-panel { padding: 22px; }
+.update-h { margin: 0 0 12px; font-stretch: 112%; font-weight: 900; font-size: clamp(1.25rem, 2.6vw, 1.6rem); }
+.for-ref { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.95rem; color: var(--green); margin-left: 6px; }
+.find-help { margin-top: 10px; }
+.found-refs { display: grid; gap: 10px; margin-top: 14px; }
+.ref-card { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: #f7faf3; cursor: pointer;
+  box-shadow: inset 3px 3px 7px rgba(13, 59, 33, 0.08), inset -2px -2px 5px rgba(255, 255, 255, 0.95); border: 1.5px solid transparent; }
+.ref-card input { width: 20px; height: 20px; min-height: 0; accent-color: var(--green); flex: none; box-shadow: none; }
+.ref-card:has(input:checked) { border-color: var(--green); background: #eaf6ea; }
+.ref-body { display: grid; gap: 2px; }
+.ref-body b { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--green-ink); }
+.ref-body small { color: var(--muted); }
+.paste-update { margin-bottom: 16px; }
+.paste-update label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--green-ink); margin-bottom: 4px; }
+.paste-update textarea { min-height: 96px; resize: vertical; }
+.checks { display: flex; flex-wrap: wrap; gap: 12px; }
+.check { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border-radius: 14px; background: #f7faf3; cursor: pointer; font-weight: 600; color: var(--green-ink);
+  box-shadow: inset 3px 3px 7px rgba(13, 59, 33, 0.08), inset -2px -2px 5px rgba(255, 255, 255, 0.95); }
+.check input { width: 20px; height: 20px; min-height: 0; accent-color: var(--green); box-shadow: none; }
+.check:has(input:checked) { background: #eaf6ea; outline: 1.5px solid #7cb98c; }
+.status-update { margin-top: 14px; }

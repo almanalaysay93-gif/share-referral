@@ -208,3 +208,18 @@ Checks:
 - Each burst has 32 particles in two shells (a fast inner shell and a slower outer shell), green and sage dots plus small dark-green sparks, and two rings.
 - A label click also fires a click on its radio, so the effect is guarded to play once per click.
 - Check: a click on a Brain death choice made 1 burst with 34 pieces and still selected the radio. No console errors.
+
+## Change on 2026-11-06: update a referral (step 4)
+
+- New page `update.html`, linked as step 4 in the step nav, from the landing hero and from every status result.
+- Step 1 finds referrals by reference, PRC number or email. Only reference, hospital, date and status are shown.
+- Step 2 accepts a pasted update, which the offline reader turns into fields, or manual choices: brain death and time, GCS, ventilator, ward, patient expired and time of death, family opted for DNR, and a note.
+- Risk accepted by the user: anyone who knows a doctor's PRC number or email can send an update for that doctor's referrals. Every update is logged and emailed to the team with old and new values, and no patient details are shown.
+
+Checks:
+
+- 16 Code.gs tests pass, including find, update and refusal tests. A mutation that skipped the identity check and one that wrote DNR to the wrong column were both caught.
+- 20 reader tests pass, including expired, time of death, DNR and "not for DNR".
+- Preview-mode browser run: the `?ref=` link found the referral, a pasted update filled brain death, time, GCS, ventilator, expired, time of death and DNR, and the update was sent.
+- At 390 x 844 the four-step nav fits with no horizontal overflow. Lighthouse mobile accessibility 100. No console errors.
+- The live Apps Script still runs the old code and answers "Unknown action." until it is redeployed.

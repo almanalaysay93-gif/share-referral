@@ -249,3 +249,71 @@ test('both emails show the clinical notes and the referral as sent', () => {
   }
   assert.match(thanks.htmlBody, /Acute CVD bleed/);
 });
+
+test('find returns referrals by reference, PRC or email without patient details', () => {
+  const { post } = setup();
+  const a = post({ action: 'submit', referral: VALID });
+  post({ action: 'submit', referral: { ...VALID, patient_name: 'Second' } });
+  const byRef = post({ action: 'find', identity: a.reference.toLowerCase() });
+  assert.equal(byRef.ok, true);
+  assert.equal(byRef.referrals.length, 1);
+  assert.equal(byRef.identifiedBy, 'reference');
+  const byPrc = post({ action: 'find', identity: '0123456' });
+  assert.equal(byPrc.referrals.length, 2);
+  const byEmail = post({ action: 'find', identity: 'MSANTOS@example.com' });
+  assert.equal(byEmail.referrals.length, 2);
+  assert.ok(!JSON.stringify(byPrc).includes('Juan'), 'no patient name');
+  assert.ok(!JSON.stringify(byPrc).includes('Second'));
+  assert.equal(post({ action: 'find', identity: '9999999' }).ok, false);
+  assert.equal(post({ action: 'find', identity: 'hello' }).ok, false);
+});
+
+test('update writes allowed columns, appends notes, logs and emails', () => {
+  const { master, sheets, mails, post } = setup();
+  const a = post({ action: 'submit', referral: { ...VALID, brain_death: 'No', brain_death_datetime: '' } });
+  mails.length = 0;
+  const res = post({ action: 'update', reference: a.reference, identity: '0123456', update: {
+    brain_death: 'Yes', brain_death_datetime: '2026-11-07T14:00', gcs: '3', ward: 'ICU 5',
+    expired: true, expired_datetime: '2026-11-08T09:30', dnr: true, note: 'Family informed.',
+    raw_text: 'Update: declared BD 11/7 2PM',
+  } });
+  assert.equal(res.ok, true);
+  const row = master.data[4];
+  assert.equal(row[10], 'ICU 5');
+  assert.equal(row[12], 3);
+  assert.equal(row[15], 'Yes');
+  assert.equal(row[16].getHours(), 14);
+  assert.equal(row[14], 'Expired');
+  assert.equal(row[7].getHours(), 9);
+  assert.equal(row[18], 'Yes');
+  assert.equal(row[8], '=FORMULA', 'formula column untouched');
+  assert.match(row[24], /Web referral SHR-/, 'earlier notes kept');
+  assert.match(row[24], /Update .* identified by PRC/);
+  assert.match(row[24], /Note: Family informed\./);
+  assert.equal(sheets['Web Referrals'].data[1][10], 'Under review');
+  const log = sheets['Referral Updates'];
+  assert.equal(log.data[1][1], a.reference);
+  assert.match(log.data[1][4], /Brain death declared \(P\): No -> Yes/);
+  assert.equal(log.data[1][6], 'Sent');
+  assert.equal(mails.length, 2);
+  assert.match(mails[0].subject, /UPDATE - PATIENT EXPIRED/);
+  assert.match(mails[0].htmlBody, /Family informed\./);
+  assert.equal(mails[1].to, 'msantos@example.com');
+  assert.match(mails[1].subject, /Update received/);
+});
+
+test('update is refused when the identity belongs to another referral or nothing changed', () => {
+  const { master, post } = setup();
+  const a = post({ action: 'submit', referral: VALID });
+  const before = JSON.stringify(master.data);
+  const wrong = post({ action: 'update', reference: a.reference, identity: '7654321', update: { note: 'x' } });
+  assert.equal(wrong.ok, false);
+  const other = post({ action: 'update', reference: a.reference, identity: 'someone@else.com', update: { note: 'x' } });
+  assert.equal(other.ok, false);
+  const empty = post({ action: 'update', reference: a.reference, identity: a.reference, update: {} });
+  assert.equal(empty.ok, false);
+  const bad = post({ action: 'update', reference: a.reference, identity: a.reference, update: { gcs: '22' } });
+  assert.deepEqual(bad.fields, ['gcs']);
+  assert.equal(JSON.stringify(master.data), before);
+  assert.equal(post({ action: 'update', reference: a.reference, identity: a.reference, update: { note: 'ok' } }).ok, true);
+});

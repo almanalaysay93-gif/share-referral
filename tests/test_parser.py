@@ -195,3 +195,24 @@ class LongClinicalReferralTests(unittest.TestCase):
 
     def test_short_referrals_keep_empty_notes(self):
         self.assertEqual(parse_referral(LABELLED, TODAY)["fields"]["notes"], "")
+
+
+class UpdateTermsTests(unittest.TestCase):
+    def test_expired_with_time(self):
+        f = parse_referral("Update on SHR-ABC123: patient expired 11/08/2026 9:30 AM. Family opted for DNR.", TODAY)["fields"]
+        self.assertEqual(f["expired"], "Yes")
+        self.assertEqual(f["expired_datetime"], "2026-11-08T09:30")
+        self.assertEqual(f["dnr"], "Yes")
+
+    def test_time_of_death(self):
+        f = parse_referral("Pronounced dead, time of death 0215H 11/09/2026", TODAY)["fields"]
+        self.assertEqual(f["expired"], "Yes")
+
+    def test_brain_dead_is_not_expired(self):
+        f = parse_referral("Declared brain dead 11/05/2026 3:40 PM", TODAY)["fields"]
+        self.assertEqual(f["expired"], "")
+        self.assertEqual(f["dnr"], "")
+
+    def test_not_dnr(self):
+        f = parse_referral("Family not for DNR, full code", TODAY)["fields"]
+        self.assertEqual(f["dnr"], "No")

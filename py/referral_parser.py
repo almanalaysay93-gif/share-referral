@@ -634,6 +634,151 @@ def parse_referral_json(text):
     return json.dumps(parse_referral(text))
 
 
+# ---------- Files: Word (.docx), Excel (.xlsx), CSV and text, read offline with the standard library ----------
+
+_W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+_S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+
+
+def _row_line(cells):
+    """['NAME', 'SANTOS, PEDRO'] -> 'NAME: SANTOS, PEDRO'. Other rows are joined with spaces."""
+    cells = [_clean(c) for c in cells if _clean(c)]
+    if len(cells) == 2 and not cells[0].endswith(":") and len(cells[0]) <= 40:
+        return cells[0] + ": " + cells[1]
+    return " ".join(cells)
+
+
+def _table_lines(rows):
+    """Label/value rows stay as they are. A header row over data rows becomes 'Header: value' lines."""
+    rows = [[_clean(str(c)) for c in r] for r in rows]
+    rows = [r for r in rows if any(r)]
+    if len(rows) >= 2 and len([c for c in rows[0] if c]) >= 3 and all(not re.fullmatch(r"[\d.]+", c) for c in rows[0] if c):
+        header = rows[0]
+        lines = []
+        for r in rows[1:]:
+            for i, value in enumerate(r):
+                if value and i < len(header) and header[i]:
+                    lines.append(header[i] + ": " + value)
+            lines.append("")
+        return lines
+    return [_row_line(r) for r in rows]
+
+
+def _docx_text(raw):
+    import io
+    import xml.etree.ElementTree as ET
+    import zipfile
+
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        root = ET.fromstring(z.read("word/document.xml"))
+
+    def para(p):
+        out = []
+        for node in p.iter():
+            if node.tag == _W + "t" and node.text:
+                out.append(node.text)
+            elif node.tag in (_W + "tab",):
+                out.append(" ")
+            elif node.tag in (_W + "br", _W + "cr"):
+                out.append("\n")
+        return "".join(out)
+
+    lines = []
+    body = root.find(_W + "body")
+    for block in (body if body is not None else []):
+        if block.tag == _W + "p":
+            lines.append(para(block))
+        elif block.tag == _W + "tbl":
+            rows = []
+            for tr in block.iter(_W + "tr"):
+                rows.append([" ".join(para(p) for p in tc.iter(_W + "p")) for tc in tr.findall(_W + "tc")])
+            lines.extend(_table_lines(rows))
+    return "\n".join(lines).strip()
+
+
+def _xlsx_text(raw):
+    import io
+    import xml.etree.ElementTree as ET
+    import zipfile
+
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        names = z.namelist()
+        shared = []
+        if "xl/sharedStrings.xml" in names:
+            for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall(_S + "si"):
+                shared.append("".join(t.text or "" for t in si.iter(_S + "t")))
+        sheets = sorted((n for n in names if re.fullmatch(r"xl/worksheets/sheet\d+\.xml", n)),
+                        key=lambda n: int(re.search(r"(\d+)", n.rsplit("/", 1)[1]).group(1)))
+        out = []
+        for name in sheets:
+            rows = []
+            for row in ET.fromstring(z.read(name)).iter(_S + "row"):
+                cells = {}
+                for c in row.findall(_S + "c"):
+                    ref = re.match(r"([A-Z]+)", c.get("r", "A"))
+                    col = 0
+                    for ch in ref.group(1) if ref else "A":
+                        col = col * 26 + ord(ch) - 64
+                    kind = c.get("t")
+                    v = c.find(_S + "v")
+                    if kind == "s" and v is not None:
+                        value = shared[int(v.text)] if v.text and int(v.text) < len(shared) else ""
+                    elif kind == "inlineStr":
+                        value = "".join(t.text or "" for t in c.iter(_S + "t"))
+                    else:
+                        value = v.text if v is not None and v.text else ""
+                        if re.fullmatch(r"-?\d+\.0", value):
+                            value = value[:-2]
+                    cells[col] = value
+                if cells:
+                    rows.append([cells.get(i, "") for i in range(1, max(cells) + 1)])
+            out.extend(_table_lines(rows))
+            out.append("")
+    return "\n".join(out).strip()
+
+
+def _csv_text(raw):
+    import csv
+    import io
+
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = raw.decode("latin-1")
+    return "\n".join(_table_lines(list(csv.reader(io.StringIO(text))))).strip()
+
+
+def extract_text(name, raw):
+    """Turn an uploaded file into referral text. Raises ValueError with a message the doctor can act on."""
+    lower = (name or "").lower()
+    try:
+        if lower.endswith(".docx"):
+            return _docx_text(raw)
+        if lower.endswith(".xlsx"):
+            return _xlsx_text(raw)
+        if lower.endswith(".csv"):
+            return _csv_text(raw)
+        if lower.endswith(".txt"):
+            try:
+                return raw.decode("utf-8-sig").strip()
+            except UnicodeDecodeError:
+                return raw.decode("latin-1").strip()
+    except Exception:
+        raise ValueError("This file could not be opened. Save it again as .docx or .xlsx and try once more.")
+    if lower.endswith((".doc", ".xls")):
+        raise ValueError("Old Word and Excel files cannot be read here. Save it as .docx or .xlsx first.")
+    raise ValueError("Upload a Word (.docx), Excel (.xlsx), CSV or text file.")
+
+
+def extract_text_json(name, data):
+    """Browser entry point: data is a JavaScript Uint8Array. Returns JSON {ok, text} or {ok: false, error}."""
+    raw = bytes(data.to_py()) if hasattr(data, "to_py") else bytes(data)
+    try:
+        return json.dumps({"ok": True, "text": extract_text(name, raw)})
+    except ValueError as err:
+        return json.dumps({"ok": False, "error": str(err)})
+
+
 if __name__ == "__main__" and __import__("sys").platform != "emscripten":
     import sys
 

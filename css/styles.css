@@ -439,3 +439,10 @@ main, .footer { position: relative; z-index: 1; }
 .organ-stack img.is-on { opacity: 1; }
 .organ-stack.is-morphing img { filter: url(#organ-morph); will-change: opacity, transform; }
 .chip-1 [data-organ-label] { display: inline-block; }
+
+/* Reader composer: upload and speak */
+.composer-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.upload-btn { cursor: pointer; }
+.composer-note { margin: 8px 2px 0; font-size: 0.8rem; color: var(--muted); }
+#mic-btn.is-live { background: #b3261e; color: #fff; box-shadow: 0 4px 0 #7a1813, 0 0 0 4px rgba(179, 38, 30, 0.18); animation: mic-pulse 1.2s ease-in-out infinite; }
+@keyframes mic-pulse { 50% { box-shadow: 0 4px 0 #7a1813, 0 0 0 9px rgba(179, 38, 30, 0.08); } }

@@ -18,14 +18,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wdth,wght@62..125,500..900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=19" />
+  <link rel="stylesheet" href="css/styles.css?v=20" />
   <link rel="preload" as="image" href="assets/art/heart.webp" />
-  <script src="js/config.js?v=8"></script>
+  <script src="js/config.js?v=9"></script>
   <script>if (!window.SHARE_CONFIG.ENDPOINT) document.documentElement.classList.add('is-demo');</script>
 </head>
 <body class="page-reader">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-send" viewBox="0 -960 960 960"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></symbol>
+    <symbol id="i-file" viewBox="0 -960 960 960"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></symbol>
+    <symbol id="i-mic" viewBox="0 -960 960 960"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"/></symbol>
     <symbol id="i-chat" viewBox="0 -960 960 960"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></symbol>
     <symbol id="i-arrow" viewBox="0 -960 960 960"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></symbol>
     <symbol id="i-list" viewBox="0 -960 960 960"><path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z"/></symbol>
@@ -53,7 +55,7 @@
     <section class="hero" data-hero aria-labelledby="hero-title">
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <p class="kicker">Step 1 of 3 · Referral reader</p>
+          <p class="kicker">Step 1 of 4 · Referral reader</p>
           <h1 id="hero-title">Paste the referral. We read it for you.</h1>
           <p class="lede">Send it the way you send it on Messenger. The offline reader pulls out the patient, the hospital and your details. You check everything on the next page before it goes to SHARE.</p>
           <p class="demo-banner">Preview mode: no referral leaves this browser.</p>
@@ -80,7 +82,7 @@
           <svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>
           <div>
             <h2 id="chat-title">Referral reader</h2>
-            <p class="panel-sub" id="reader-state">Offline reader. No AI. Nothing is sent from this page.</p>
+            <p class="panel-sub" id="reader-state">Offline reader. Paste, upload a file, or speak.</p>
           </div>
         </div>
         <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
@@ -88,12 +90,22 @@
           <label class="sr-only" for="paste">Paste the referral text</label>
           <textarea id="paste" rows="5" placeholder="Name: Juan Dela Cruz, 45/M, ICU 3&#10;Dx: Acute CVD bleed, GCS 3&#10;Declared brain dead 11/05/2026 3:40 PM&#10;Referred by Dr. Maria Santos 0917 123 4567"></textarea>
           <div class="composer-row">
-            <button type="button" class="btn-ghost" id="sample-btn">Try a sample</button>
+            <div class="composer-tools">
+              <label class="btn-ghost upload-btn" for="file-input">
+                <svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span>Upload file</span>
+              </label>
+              <input type="file" id="file-input" class="sr-only" accept=".docx,.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain" />
+              <button type="button" class="btn-ghost" id="mic-btn" hidden aria-pressed="false">
+                <svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg><span>Speak</span>
+              </button>
+            </div>
             <button type="submit" class="btn-send" id="read-btn" aria-label="Read referral">
               <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg>
               <span>Read</span>
             </button>
           </div>
+          <p class="composer-note" id="composer-note">Word (.docx), Excel (.xlsx), CSV or text files are read on this device and are not uploaded.</p>
+          <p class="composer-note mic-note" id="mic-note" hidden>Speak sends your voice to your browser's speech service (Google in Chrome, Apple in Safari) to turn it into text. Say the clinical details; you can type the patient's name yourself.</p>
         </form>
       </div>
 
@@ -133,7 +145,7 @@
   <script src="js/ribbon.js?v=6"></script>
   <script src="js/motion.js?v=8"></script>
   <script src="js/clickfx.js?v=3"></script>
-  <script src="js/reader.js?v=1"></script>
-  <script src="js/reader-page.js?v=2"></script>
+  <script src="js/reader.js?v=2"></script>
+  <script src="js/reader-page.js?v=3"></script>
 </body>
 </html>

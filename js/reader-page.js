@@ -4,12 +4,6 @@
   const { LABELS, el, draft } = window.Share;
   const $ = (id) => document.getElementById(id);
   const REQUIRED = ['patient_name', 'hospital', 'doctor_name'];
-  const SAMPLE = 'Good evening SHARE, referral po:\n' +
-    'Pt: Juan Dela Cruz, 45/M, ICU 3, Davao Doctors Hospital\n' +
-    'Admitted 11/02/2026\n' +
-    'Dx: Acute CVD bleed, left thalamoganglionic, hypertensive. GCS 3 (E1VTM1), intubated on MV\n' +
-    'Declared brain dead 11/05/2026 3:40 PM, apnea test positive\n' +
-    'Referred by Dr. Maria Santos, PRC 0123456, 0917 123 4567';
 
   const messages = $('messages');
   const paste = $('paste');
@@ -82,7 +76,88 @@
 
   paste.addEventListener('focus', () => { window.ReferralReader.start().catch(() => {}); }, { once: true });
 
-  $('sample-btn').addEventListener('click', () => { paste.value = SAMPLE; paste.focus(); });
+  /* ---------- Upload: Word, Excel, CSV or text, read on this device ---------- */
+
+  $('file-input').addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const state = $('reader-state');
+    state.textContent = 'Opening ' + file.name + '…';
+    try {
+      const res = await window.ReferralReader.extract(file);
+      if (!res.ok) {
+        addMsg('bot', [res.error], 'msg-warn');
+        return;
+      }
+      if (!res.text.trim()) {
+        addMsg('bot', ['That file has no text I can read. Paste the referral instead.'], 'msg-warn');
+        return;
+      }
+      paste.value = res.text;
+      addMsg('bot', ['I opened ' + file.name + '. Reading it now.']);
+      $('composer').requestSubmit();
+    } catch (err) {
+      addMsg('bot', ['I could not open that file on this connection. Paste the referral instead.'], 'msg-warn');
+    } finally {
+      state.textContent = 'Offline reader. Paste, upload a file, or speak.';
+    }
+  });
+
+  /* ---------- Speak: the browser's speech service turns the doctor's voice into text ---------- */
+
+  const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const mic = $('mic-btn');
+  if (Speech) {
+    mic.hidden = false;
+    $('mic-note').hidden = false;
+    let rec = null;
+    let base = '';
+    const label = mic.querySelector('span');
+    const stop = () => { if (rec) rec.stop(); };
+    mic.addEventListener('click', () => {
+      if (rec) { stop(); return; }
+      rec = new Speech();
+      rec.lang = 'en-PH';
+      rec.continuous = true;
+      rec.interimResults = true;
+      base = paste.value ? paste.value.replace(/\s*$/, '\n') : '';
+      rec.onresult = (event) => {
+        let finalText = '';
+        let interim = '';
+        for (let i = 0; i < event.results.length; i++) {
+          const piece = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalText += piece + ' ';
+          else interim += piece;
+        }
+        paste.value = base + finalText + interim;
+      };
+      rec.onerror = (event) => {
+        const msg = event.error === 'not-allowed' ? 'Allow the microphone for this page to use Speak.'
+          : event.error === 'network' ? 'Speak needs an internet connection to your browser\'s speech service.'
+          : event.error === 'no-speech' ? 'I did not hear anything. Tap Speak and try again.'
+          : 'Speak stopped (' + event.error + '). You can type or paste instead.';
+        addMsg('bot', [msg], 'msg-warn');
+      };
+      rec.onend = () => {
+        rec = null;
+        mic.classList.remove('is-live');
+        mic.setAttribute('aria-pressed', 'false');
+        label.textContent = 'Speak';
+        $('reader-state').textContent = 'Offline reader. Paste, upload a file, or speak.';
+        if (paste.value.trim()) paste.focus();
+      };
+      try {
+        rec.start();
+        mic.classList.add('is-live');
+        mic.setAttribute('aria-pressed', 'true');
+        label.textContent = 'Stop';
+        $('reader-state').textContent = 'Listening… say the referral, then tap Stop and press Read.';
+      } catch (err) {
+        rec = null;
+      }
+    });
+  }
 
   paste.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $('composer').requestSubmit(); }
@@ -129,7 +204,7 @@
       paste.value = text;
     } finally {
       clearTimeout(slow);
-      $('reader-state').textContent = 'Offline reader. No AI. Nothing is sent from this page.';
+      $('reader-state').textContent = 'Offline reader. Paste, upload a file, or speak.';
       btn.disabled = false;
     }
   });

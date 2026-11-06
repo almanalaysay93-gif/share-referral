@@ -28,16 +28,26 @@
         }),
       ]);
       pyodide.runPython(source);
-      return pyodide.globals.get('parse_referral_json');
+      return {
+        parse: pyodide.globals.get('parse_referral_json'),
+        extract: pyodide.globals.get('extract_text_json'),
+      };
     })();
     ready.catch(() => { ready = null; });
     return ready;
   }
 
   async function read(text) {
-    const parse = await start();
-    return JSON.parse(parse(text));
+    const py = await start();
+    return JSON.parse(py.parse(text));
   }
 
-  window.ReferralReader = { start, read };
+  /** Word (.docx), Excel (.xlsx), CSV or text file -> referral text. Read in this tab, never uploaded. */
+  async function extract(file) {
+    if (file.size > 5 * 1024 * 1024) return { ok: false, error: 'This file is larger than 5 MB.' };
+    const [py, buffer] = await Promise.all([start(), file.arrayBuffer()]);
+    return JSON.parse(py.extract(file.name, new Uint8Array(buffer)));
+  }
+
+  window.ReferralReader = { start, read, extract };
 })();

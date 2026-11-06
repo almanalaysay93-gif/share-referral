@@ -216,3 +216,82 @@ class UpdateTermsTests(unittest.TestCase):
     def test_not_dnr(self):
         f = parse_referral("Family not for DNR, full code", TODAY)["fields"]
         self.assertEqual(f["dnr"], "No")
+
+
+import io as _io
+import zipfile as _zipfile
+
+from referral_parser import extract_text  # noqa: E402
+
+W_NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+
+
+def _docx(body_xml):
+    buf = _io.BytesIO()
+    with _zipfile.ZipFile(buf, "w") as z:
+        z.writestr("word/document.xml", '<w:document %s><w:body>%s</w:body></w:document>' % (W_NS, body_xml))
+    return buf.getvalue()
+
+
+def _p(text):
+    return "<w:p><w:r><w:t xml:space=\"preserve\">%s</w:t></w:r></w:p>" % text
+
+
+def _row(*cells):
+    return "<w:tr>%s</w:tr>" % "".join("<w:tc>%s</w:tc>" % _p(c) for c in cells)
+
+
+def _xlsx(rows):
+    strings = []
+    sheet_rows = []
+    for r, row in enumerate(rows, 1):
+        cells = []
+        for c, value in enumerate(row):
+            ref = "ABCDEFGH"[c] + str(r)
+            if isinstance(value, (int, float)):
+                cells.append('<c r="%s"><v>%s</v></c>' % (ref, value))
+            else:
+                strings.append(value)
+                cells.append('<c r="%s" t="s"><v>%d</v></c>' % (ref, len(strings) - 1))
+        sheet_rows.append('<row r="%d">%s</row>' % (r, "".join(cells)))
+    ns = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
+    buf = _io.BytesIO()
+    with _zipfile.ZipFile(buf, "w") as z:
+        z.writestr("xl/sharedStrings.xml", "<sst %s>%s</sst>" % (ns, "".join("<si><t>%s</t></si>" % s for s in strings)))
+        z.writestr("xl/worksheets/sheet1.xml", "<worksheet %s><sheetData>%s</sheetData></worksheet>" % (ns, "".join(sheet_rows)))
+    return buf.getvalue()
+
+
+class FileExtractTests(unittest.TestCase):
+    def test_docx_paragraphs_and_label_table(self):
+        raw = _docx(_p("Respectfully referring patient:") + "<w:tbl>" + _row("NAME", "SANTOS, PEDRO")
+                    + _row("AGE/SEX", "57/M") + _row("LOCATION", "ER RED ZONE") + "</w:tbl>" + _p("GCS 3, intubated on MV"))
+        text = extract_text("referral.docx", raw)
+        self.assertIn("NAME: SANTOS, PEDRO", text)
+        f = parse_referral(text, TODAY)["fields"]
+        self.assertEqual(f["patient_name"], "SANTOS, PEDRO")
+        self.assertEqual((f["age"], f["sex"], f["ward"], f["gcs"], f["ventilator"]), ("57", "Male", "ER RED ZONE", "3", "Yes"))
+
+    def test_xlsx_label_column_layout(self):
+        raw = _xlsx([["Patient name", "Juan Dela Cruz"], ["Age", 45], ["Hospital", "Davao Doctors Hospital"], ["GCS", 3]])
+        f = parse_referral(extract_text("referral.xlsx", raw), TODAY)["fields"]
+        self.assertEqual((f["patient_name"], f["age"], f["hospital"], f["gcs"]), ("Juan Dela Cruz", "45", "Davao Doctors Hospital", "3"))
+
+    def test_xlsx_header_row_layout(self):
+        raw = _xlsx([["Patient name", "Age/Sex", "Hospital", "Referred by"],
+                     ["Ana Reyes", "62/F", "San Pedro Hospital", "Dr. Jose Lim"]])
+        f = parse_referral(extract_text("log.xlsx", raw), TODAY)["fields"]
+        self.assertEqual((f["patient_name"], f["age"], f["sex"], f["hospital"], f["doctor_name"]),
+                         ("Ana Reyes", "62", "Female", "San Pedro Hospital", "Dr. Jose Lim"))
+
+    def test_csv_and_text(self):
+        f = parse_referral(extract_text("r.csv", "Name,Pedro Cruz\nWard,CIU\n".encode("utf-8-sig")), TODAY)["fields"]
+        self.assertEqual((f["patient_name"], f["ward"]), ("Pedro Cruz", "CIU"))
+        self.assertEqual(extract_text("r.txt", "GCS 3".encode()), "GCS 3")
+
+    def test_unsupported_formats(self):
+        for name in ("old.doc", "old.xls", "scan.pdf"):
+            with self.assertRaises(ValueError):
+                extract_text(name, b"xxxx")
+        with self.assertRaises(ValueError):
+            extract_text("broken.docx", b"not a zip")

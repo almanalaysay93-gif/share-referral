@@ -240,3 +240,17 @@ Checks:
 - Anime.js intro, once per browser tab: the SPMC logo then the SHARE logo spring in from 30 percent scale with a small turn, the SHARE letters rise, and the subtitle slides in. Every 9 s the SHARE logo beats twice. Hovering the brand tilts both logos.
 - Reduced motion: no intro, no heartbeat, no tilt.
 - Checks: Chrome at 1440 x 900 showed SPMC then SHARE at 56 px, the logos settled to scale 1 by 1.5 s, no console errors. At 390 x 844 the logos were 44 px, the brand ended at 105 px and the nav started at 133 px, no horizontal overflow.
+
+## Change on 2026-11-06: upload files and speak on the Read page
+
+- "Try a sample" is removed.
+- "Upload file" reads Word (.docx), Excel (.xlsx), CSV and text files with the Python reader in the browser (standard library `zipfile`, `xml.etree` and `csv` in Pyodide). The file is not uploaded. A two-column table becomes "Label: value" lines, and a header row over data rows becomes "Header: value" lines. Old .doc and .xls files, PDFs and broken files get a clear message.
+- "Speak" uses the browser speech service (SpeechRecognition, `en-PH`, continuous with live text) and fills the paste box. A notice says the voice goes to the browser's speech service (Google in Chrome, Apple in Safari). The button is hidden where the browser has no speech service, for example Brave.
+- User decision: browser speech, not on-device Whisper, for voice. Uploaded audio files are not possible with browser speech and are not built.
+- The landing fact now says pasted text and files are read offline and voice uses the browser speech service.
+
+Checks:
+
+- 25 reader tests pass, including Word label tables, Excel label columns, Excel header rows, CSV, text and refused formats. Two mutations were caught.
+- In Chrome, uploading a test .docx filled 9 details: name, age, sex, hospital, ward, GCS, ventilator, doctor and brainstem notes. No console errors.
+- The Speak button showed in Chrome. Speech itself was not tested, because the test browser has no microphone.

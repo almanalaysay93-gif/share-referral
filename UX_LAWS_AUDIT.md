@@ -36,3 +36,12 @@ Evidence: Chrome at 1440 x 900 and 390 x 844 (mobile, touch), Lighthouse mobile 
 - Horizontal overflow: none at 390 px and 1440 px.
 - Scroll parallax moves the hero layers forward and back with the scroll position.
 - With reduced motion, the hero is static and the copy stays fully visible.
+
+## Change on 2026-11-06: motivational chips and Anime.js titles
+
+- The hero chips now show donation facts: "1 donor can save up to 8 lives", "Tissue can help 75+ more", and organ-specific diseases (heart failure, kidney disease and dialysis, liver failure, cirrhosis, biliary atresia).
+- The figures come from the general public figures on organdonor.gov (HRSA). They have no SHARE clinical sign-off.
+- `js/motion.js` uses Anime.js 4.5.0 (MIT, self-hosted in `js/vendor/`) to split each page title into characters, reveal them, and run a slow green colour wave. It also fades in the chips and counts up the numbers.
+- Screen readers get the full title from the hidden accessible copy that `splitText` adds.
+- With reduced motion, `js/motion.js` does nothing, and the title, chips and numbers stay static.
+- Lighthouse mobile accessibility stayed at 100 on the reader page. No console errors. No overflow at 390 px.

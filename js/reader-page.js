@@ -113,11 +113,11 @@
     $('mic-note').hidden = false;
     const label = mic.querySelector('span');
     let rec = null;
-    let wanted = false;      // the doctor wants to keep listening
-    let base = '';           // paste box text before this dictation segment
-    let spoken = '';         // final speech text written so far in this segment
-    let doneIndex = 0;       // results before this index are already in `spoken`
-    let written = '';        // what this code last wrote into the box
+    let wanted = false;   // the doctor wants to keep listening
+    let base = '';        // paste box text before this session's speech
+    let offset = 0;       // final results of this session already kept in `base` (after a typed edit)
+    let interim = '';     // unfinished words currently shown at the end of the box
+    let written = '';     // what this code last wrote into the box
 
     const setLive = (live) => {
       mic.classList.toggle('is-live', live);
@@ -125,46 +125,47 @@
       label.textContent = live ? 'Stop' : 'Speak';
     };
 
-    // Start a recognition session. Chrome ends a session after a pause, so the session restarts while wanted.
+    // Chrome ends a session after a pause, so a session restarts while the doctor wants to keep talking.
     const begin = () => {
+      // Drop the unfinished words from the box: the new session will hear them again if they matter.
+      if (interim && paste.value.endsWith(interim)) paste.value = paste.value.slice(0, paste.value.length - interim.length);
+      base = paste.value ? paste.value.replace(/\s*$/, '\n') : '';
+      offset = 0;
+      interim = '';
+      written = paste.value;
       rec = new Speech();
       rec.lang = 'en-PH';
       rec.continuous = true;
       rec.interimResults = true;
       rec.maxAlternatives = 1;
-      base = paste.value ? paste.value.replace(/\s*$/, '\n') : '';
-      spoken = '';
-      doneIndex = 0;
-      written = paste.value;
 
       rec.onresult = (event) => {
-        // If the doctor typed into the box since the last update, keep their text and start a new segment.
+        // Build the text from every result in this session, so a result is never counted twice.
+        const finals = [];
+        let pending = '';
+        for (let i = 0; i < event.results.length; i++) {
+          const piece = event.results[i][0].transcript.trim();
+          if (event.results[i].isFinal) finals.push(piece);
+          else pending = piece;
+        }
+        // The doctor typed into the box: keep their text and continue after the finals heard so far.
         if (paste.value !== written) {
           base = paste.value.replace(/\s*$/, '\n');
-          spoken = '';
+          offset = finals.length;
         }
-        for (let i = doneIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            spoken += event.results[i][0].transcript.trim() + ' ';
-            doneIndex = i + 1;
-          }
-        }
-        let interim = '';
-        for (let i = doneIndex; i < event.results.length; i++) {
-          if (!event.results[i].isFinal) interim += event.results[i][0].transcript;
-        }
-        written = base + spoken + interim;
+        const spoken = finals.slice(offset).join(' ');
+        interim = pending;
+        written = base + spoken + (spoken && pending ? ' ' : '') + pending;
         paste.value = written;
       };
 
       rec.onerror = (event) => {
-        if (event.error === 'aborted') return;
+        if (event.error === 'aborted' || event.error === 'no-speech') return;
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') wanted = false;
         const msg = event.error === 'not-allowed' ? 'Allow the microphone for this page to use Speak.'
           : event.error === 'network' ? 'Speak needs an internet connection to your browser\'s speech service.'
-          : event.error === 'no-speech' ? 'I did not hear anything. Keep talking, or tap Speak again.'
           : 'Speak stopped (' + event.error + '). You can type or paste instead.';
-        if (event.error !== 'no-speech') addMsg('bot', [msg], 'msg-warn');
+        addMsg('bot', [msg], 'msg-warn');
       };
 
       rec.onend = () => {
@@ -172,6 +173,7 @@
         if (wanted) {
           try { begin(); rec.start(); return; } catch (err) { wanted = false; }
         }
+        interim = '';
         setLive(false);
         $('reader-state').textContent = 'Offline reader. Paste, upload a file, or speak.';
         if (paste.value.trim()) paste.focus();

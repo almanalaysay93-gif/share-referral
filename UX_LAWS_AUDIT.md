@@ -261,3 +261,8 @@ Checks:
 - Listening restarts when Chrome ends a session after a pause, until the doctor taps Stop. Before, the page stopped and the doctor had to tap again.
 - Checked in Chrome with a stand-in speech engine: typed text survived, a restart kept the button live, and later speech was added after the typed text.
 - Not checked: real speech accuracy, which needs a microphone and Chrome on the phone.
+
+## Change on 2026-11-06: Speak repeats
+
+- The text is now rebuilt from all results in the current session, not from a saved position. Unfinished words are removed from the box before a restart.
+- Not reproduced: a single spoken "hello" repeating. The stand-in engine repeats a word only when the test asks it to, so the real cause is not confirmed. Needs a test on the phone.

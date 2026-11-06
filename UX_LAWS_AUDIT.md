@@ -45,3 +45,48 @@ Evidence: Chrome at 1440 x 900 and 390 x 844 (mobile, touch), Lighthouse mobile 
 - Screen readers get the full title from the hidden accessible copy that `splitText` adds.
 - With reduced motion, `js/motion.js` does nothing, and the title, chips and numbers stay static.
 - Lighthouse mobile accessibility stayed at 100 on the reader page. No console errors. No overflow at 390 px.
+
+## Change on 2026-11-06: clay panels and button press
+
+The reader page, the form page, and the status page keep the same layout.
+Each panel is a matte clay slab with an outer shadow and a light inner rim.
+Field groups, the found-field list, the reference box, and the status steps sit in inset trays.
+An empty found-field list stays plain text.
+Primary buttons, the send button, and ghost buttons use the same clay and a solid lip shadow.
+Anime.js moves a pressed button down by 4 px in 90 ms.
+The button returns in 220 ms.
+CSS owns the shadow.
+Reduced motion keeps the clay and skips the press.
+The hero, the type, and the SHARE green stay the same.
+
+| Law | Result | Evidence |
+|---|---|---|
+| 1 Fitts | Compliant | Visible buttons measured at least 44 px high at 1440 px and 390 px. |
+| 2 Hick | Compliant | Each page still has one job and one main action. |
+| 3 Jakob | Compliant | The chat, the step nav, and the form layout stay the same. |
+| 4 Miller | Compliant | The form still has three groups. |
+| 5 Tesler | Compliant | The reader still fills the form. |
+| 6 Aesthetic-usability | Compliant | Clay uses the SHARE green. White text on the button face is at least 5.07 to 1. |
+| 7 Doherty | Partial | The press returns in 220 ms. A send or a status check still waits on Apps Script. |
+| 8 Peak-end | Compliant | The thank-you screen content did not change. |
+| 9 Serial position | Compliant | Read stays first. Send stays at the end of the form. |
+| 10 Von Restorff | Compliant | The primary button stays green. The ghost button stays light. |
+| 11 Pareto | Compliant | Three fields stay required. |
+| 12 Occam | Compliant | No new step was added. |
+| 13 Postel | Compliant | The reader rules and the old status links did not change. |
+| 14 Zeigarnik | Compliant | The step nav still shows progress from 1 to 3. |
+
+## Checks for the clay change
+
+Headless Chromium loaded the local pages on 2026-11-06.
+The pages requested `styles.css?v=9` and `motion.js?v=3`.
+Horizontal overflow was 0 at 1440 x 900 and at 390 x 844 on all three pages.
+A send button, a ghost button, and the main form link moved to 4 px and then returned to 0.
+A second press during the return still ended at 0.
+With reduced motion, the press left the transform at none.
+The first Tab stop showed a 3 px green outline.
+No page exception was recorded.
+The ui-ux-pro-max search was not run.
+The web animation skill pack was not installed.
+Chrome DevTools could not open its locked profile, so these checks used headless Chromium.
+The live GitHub Pages site was not updated.

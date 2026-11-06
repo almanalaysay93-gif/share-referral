@@ -1,13 +1,58 @@
-// Anime.js 4.5.0 motion for the hero: title text split and reveal, a slow colour wave, chip fade-in, number count-up.
-// Owns: .hero h1 characters, .glass opacity, [data-count] text. The 3D transforms stay with js/common.js and CSS.
+// Anime.js 4.5.0. Owns translateY on .btn-primary, .btn-send and .btn-ghost.
+// Also owns the hero title split, colour wave, chip fade and number count when a hero is present.
+// CSS owns button shadows. The 3D hero transforms stay with js/common.js and CSS.
 (function () {
   'use strict';
   const A = window.anime;
-  const hero = document.querySelector('[data-hero]');
-  if (!A || !hero) return;
+  if (!A) return;
   const { animate, splitText, stagger } = A;
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (still) return; // Static title, chips and numbers stay as written in the HTML.
+
+  // Anime owns translateY on the clay buttons. CSS owns the shadow lip.
+  if (!still) {
+    document.querySelectorAll('.btn-primary, .btn-send, .btn-ghost').forEach((btn) => {
+      let running = null;
+      let pressed = false;
+      const move = (y, duration) => {
+        if (running && typeof running.revert === 'function') {
+          try { running.revert(); } catch (err) { /* the tween already ended */ }
+        }
+        running = animate(btn, { y: y, duration: duration, ease: 'out(3)' });
+      };
+      const down = () => {
+        if (btn.disabled || pressed) return;
+        pressed = true;
+        move('4px', 90);
+      };
+      const up = () => {
+        if (!pressed) return;
+        pressed = false;
+        move('0px', 220);
+      };
+      btn.addEventListener('pointerdown', (event) => {
+        if (btn.disabled) return;
+        if (typeof btn.setPointerCapture === 'function') {
+          try { btn.setPointerCapture(event.pointerId); } catch (err) { /* already captured */ }
+        }
+        down();
+      });
+      btn.addEventListener('pointerup', up);
+      btn.addEventListener('pointercancel', up);
+      btn.addEventListener('lostpointercapture', up);
+      btn.addEventListener('keydown', (event) => {
+        if (event.repeat) return;
+        const space = event.key === ' ' && btn.tagName === 'BUTTON';
+        if (event.key === 'Enter' || space) down();
+      });
+      btn.addEventListener('keyup', (event) => {
+        const space = event.key === ' ' && btn.tagName === 'BUTTON';
+        if (event.key === 'Enter' || space) up();
+      });
+    });
+  }
+
+  const hero = document.querySelector('[data-hero]');
+  if (!hero || still) return; // Static title, chips and numbers stay as written in the HTML.
 
   const title = hero.querySelector('h1');
   const split = splitText(title, { words: { wrap: 'clip' }, chars: true });

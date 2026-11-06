@@ -90,3 +90,49 @@ The ui-ux-pro-max search was not run.
 The web animation skill pack was not installed.
 Chrome DevTools could not open its locked profile, so these checks used headless Chromium.
 The live GitHub Pages site was not updated.
+
+## Change on 2026-11-06: landing page
+
+The main address now opens a landing page.
+The reader moved to `read.html`.
+Old `#status?ref=` links on the main address still open the status page.
+
+The landing page has five parts:
+
+1. A hero with the 3D heart, "One referral can save up to eight lives", and the Refer and Check buttons.
+2. A pinned transcription demo, where a de-identified referral types in and eight form fields fill as the page scrolls.
+3. A pinned donor body map, where nine organ and tissue tiles light in turn, with the counts climbing to 8 lives and 75+ people.
+4. Four steps from referral to recipients.
+5. A final call to action.
+
+`js/landing.js` owns one scroll loop for both pinned sections.
+Anime.js tweens the counts and reveals the four steps.
+Below 1000 px wide, below 700 px high, with reduced motion, or without JavaScript, the sections are not pinned and show their finished state.
+
+| Law | Result | Evidence |
+|---|---|---|
+| 1 Fitts | Compliant | Refer a patient is a large green button in the hero and at the end. |
+| 2 Hick | Compliant | Two actions only: Refer a patient and Check a referral. |
+| 3 Jakob | Compliant | Normal landing order: hero, feature, benefit, steps, call to action. |
+| 4 Miller | Compliant | Three facts in the demo, four steps, nine tiles in three groups of three on phones. |
+| 5 Tesler | Compliant | The demo shows the reader doing the typing. |
+| 6 Aesthetic-usability | Compliant | Same SHARE green, clay panels and organ art as the app. |
+| 7 Doherty | Compliant | Scroll updates run in one animation frame. Count tweens take 420 ms. |
+| 8 Peak-end | Compliant | The page ends on "It starts with your referral" with the Refer button. |
+| 9 Serial position | Compliant | The main action is first in the hero and last on the page. |
+| 10 Von Restorff | Compliant | Organ tiles light in green, tissue tiles in gold. |
+| 11 Pareto | Compliant | The demo shows the fields that matter most to the coordinator. |
+| 12 Occam | Compliant | No new form or account. The landing only links into the existing three steps. |
+| 13 Postel | Compliant | Old links still work. The page works without JavaScript. |
+| 14 Zeigarnik | Compliant | The counters and the field count show progress while scrolling. |
+
+## Checks for the landing page
+
+- Chrome at 1440 x 900: the demo had 132, 321 and 321 characters typed and 0, 3 and 8 fields filled at 25, 60 and 95 percent of its scroll.
+- The donor map had 2, 5 and 9 tiles lit and showed 3, 7 and 8 lives and 0, 0 and 75 tissue at 20, 50 and 95 percent.
+- At 390 x 844 the sections were not pinned, all tiles and fields showed, and horizontal overflow was 0.
+- With reduced motion the sections were not pinned and showed their finished state.
+- Lighthouse mobile on the landing page: accessibility 100 after the GI badge colour fix, best practices 100.
+- `read.html` read the sample and showed 15 found fields, and its Continue link goes to `form.html`.
+- No console errors or warnings.
+- The figures 8 and 75+ come from organdonor.gov and have no SHARE clinical sign-off.

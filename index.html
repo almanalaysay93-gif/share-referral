@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Read a referral · SHARE</title>
-  <meta name="description" content="Paste a brain death referral and the SHARE reader fills in the referral form for you." />
+  <title>SHARE brain death referral</title>
+  <meta name="description" content="Refer a patient with brain death to SHARE. Paste the referral and the offline reader fills the form. One donor can save up to 8 lives." />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#008037" />
   <script>
-    // Old thank-you emails link to index.html#status?ref=SHR-XXXXXX. Send them to the status page.
+    // Old thank-you emails link to the site root with #status?ref=SHR-XXXXXX. Send them to the status page.
     (function () {
       var m = /^#status\?ref=([A-Za-z0-9-]+)/.exec(location.hash);
       if (m) location.replace('status.html?ref=' + encodeURIComponent(m[1].toUpperCase()));
@@ -19,53 +19,56 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wdth,wght@62..125,500..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=9" />
+  <link rel="stylesheet" href="css/landing.css?v=1" />
   <link rel="preload" as="image" href="assets/art/heart.webp" />
   <script src="js/config.js?v=6"></script>
-  <script>if (!window.SHARE_CONFIG.ENDPOINT) document.documentElement.classList.add('is-demo');</script>
 </head>
-<body class="page-reader">
+<body class="page-landing">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="i-send" viewBox="0 -960 960 960"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></symbol>
-    <symbol id="i-chat" viewBox="0 -960 960 960"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></symbol>
     <symbol id="i-arrow" viewBox="0 -960 960 960"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></symbol>
-    <symbol id="i-list" viewBox="0 -960 960 960"><path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 -960 960 960"><path d="m422-232 207-248H469l29-227-185 267h139l-30 208ZM320-80l40-280H160l360-520h80l-40 320h240L400-80h-80Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 -960 960 960"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/></symbol>
+    <symbol id="i-check" viewBox="0 -960 960 960"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></symbol>
   </svg>
 
-  <a class="skip-link" href="#paste">Skip to the paste box</a>
+  <a class="skip-link" href="#main">Skip to the content</a>
 
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="./" aria-label="SHARE referral, start page">
+      <a class="brand" href="./" aria-label="SHARE referral, home page">
         <img src="assets/share_logo.webp" width="44" height="44" alt="SHARE logo" />
         <img src="assets/spmc_logo.webp" width="33" height="44" alt="Southern Philippines Medical Center logo" />
         <span class="brand-text"><b>SHARE</b><small>Brain death referral</small></span>
       </a>
       <nav class="stepnav" aria-label="Referral steps">
-        <a href="./" aria-current="page"><b>1</b><span>Read</span></a>
+        <a href="read.html"><b>1</b><span>Read</span></a>
         <a href="form.html"><b>2</b><span>Send</span></a>
         <a href="status.html"><b>3</b><span>Status</span></a>
       </nav>
     </div>
   </header>
 
-  <main>
-    <section class="hero" data-hero aria-labelledby="hero-title">
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero hero-landing" data-hero aria-labelledby="hero-title">
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <p class="kicker">Step 1 of 3 · Referral reader</p>
-          <h1 id="hero-title">Paste the referral. We read it for you.</h1>
-          <p class="lede">Send it the way you send it on Messenger. The offline reader pulls out the patient, the hospital and your details. You check everything on the next page before it goes to SHARE.</p>
-          <p class="demo-banner">Preview mode: no referral leaves this browser.</p>
+          <p class="kicker">SHARE · Southern Philippines Medical Center</p>
+          <h1 id="hero-title">One referral can save up to eight lives.</h1>
+          <p class="lede">Send SHARE your brain death referral the way you already write it. Our offline reader turns your Messenger text into a complete referral in seconds, so the coordinator on duty can act at once.</p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="read.html">Refer a patient<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn-ghost" href="status.html">Check a referral</a>
+          </div>
         </div>
         <div class="stage" aria-hidden="true">
           <div class="scene">
             <span class="layer plane"></span>
             <span class="layer ring"></span>
-            <span class="layer numeral">01</span>
-            <img class="layer organ" src="assets/art/heart.webp" width="560" height="560" alt="" />
             <svg class="layer pulse" viewBox="0 0 400 80"><path pathLength="1000" d="M0 50 H120 L135 50 L150 18 L165 72 L180 8 L195 50 H260 L272 50 L282 34 L292 50 H400"/></svg>
             <span class="layer orbit"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            <span class="layer glass chip-1"><b class="dot-ok"></b><span>Heart: for end-stage heart failure</span></span>
+            <img class="layer organ" src="assets/art/heart.webp" width="560" height="560" alt="" />
+            <span class="layer glass chip-1"><b class="dot-ok"></b><span>Paste, read, check, send</span></span>
             <span class="layer glass chip-2"><b class="dot-ok"></b><span>1 donor can save up to <strong data-count="8">8</strong> lives</span></span>
             <span class="layer glass chip-3"><b class="dot-wait"></b><span>Tissue can help <strong data-count="75">75</strong>+ more</span></span>
           </div>
@@ -73,50 +76,107 @@
       </div>
     </section>
 
-    <section class="workspace wrap reader-grid" aria-label="Referral reader">
-      <div class="panel chat" aria-labelledby="chat-title">
-        <div class="panel-head">
-          <svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>
-          <div>
-            <h2 id="chat-title">Referral reader</h2>
-            <p class="panel-sub" id="reader-state">Offline reader. No AI. Nothing is sent from this page.</p>
+    <!-- Transcription demo: pinned, scroll-driven -->
+    <section class="scrub demo" data-scrub="demo" aria-labelledby="demo-title">
+      <div class="scrub-sticky">
+        <div class="wrap demo-grid">
+          <div class="demo-copy">
+            <p class="kicker">Automated transcription</p>
+            <h2 id="demo-title">Paste it the way you send it. The reader does the typing.</h2>
+            <ul class="facts">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-bolt"/></svg><span><b>Seconds, not minutes.</b> Name, age, ward, GCS, diagnosis and brain death status are filled for you.</span></li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg><span><b>Offline. No AI.</b> Hard-coded Python reads the text inside your browser. Nothing is uploaded until you press Send.</span></li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span><b>Clinical notes kept.</b> Brainstem reflexes, NIHSS, CT and vital signs go to the coordinator in one note.</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
-        <form class="composer" id="composer" autocomplete="off">
-          <label class="sr-only" for="paste">Paste the referral text</label>
-          <textarea id="paste" rows="5" placeholder="Name: Juan Dela Cruz, 45/M, ICU 3&#10;Dx: Acute CVD bleed, GCS 3&#10;Declared brain dead 11/05/2026 3:40 PM&#10;Referred by Dr. Maria Santos 0917 123 4567"></textarea>
-          <div class="composer-row">
-            <button type="button" class="btn-ghost" id="sample-btn">Try a sample</button>
-            <button type="submit" class="btn-send" id="read-btn" aria-label="Read referral">
-              <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg>
-              <span>Read</span>
-            </button>
-          </div>
-        </form>
-      </div>
 
-      <aside class="panel found" aria-labelledby="found-title">
-        <div class="panel-head">
-          <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>
-          <div>
-            <h2 id="found-title">What the reader found</h2>
-            <p class="panel-sub">Kept in this browser tab only, until you send or clear it.</p>
+          <div class="demo-stage">
+            <div class="panel demo-chat" aria-label="Example referral text">
+              <p class="demo-label">Messenger</p>
+              <pre class="demo-text" data-type>Good evening doctors!
+Respectfully referring patient:
+NAME: SANTOS, PEDRO
+AGE/SEX: 57/M
+LOCATION: ER RED ZONE
+CURRENT WORKING IMPRESSION:
+ACUTE CVD BLEED, LEFT FRONTOTEMPORAL, ICH SCORE 4
+NEURO PE: GCS 3, fixed dilated pupils,
+(-) corneal, (-) gag, (+) spontaneous breathing
+Intubated, on MV
+Will not proceed with BD yet.</pre>
+            </div>
+            <div class="demo-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow"/></svg></div>
+            <div class="panel demo-form" aria-label="Fields the reader fills">
+              <p class="demo-label">Referral form</p>
+              <dl class="demo-fields">
+                <div data-field><dt>Patient</dt><dd>SANTOS, PEDRO</dd></div>
+                <div data-field><dt>Age / sex</dt><dd>57 · Male</dd></div>
+                <div data-field><dt>Ward</dt><dd>ER RED ZONE</dd></div>
+                <div data-field><dt>Diagnosis</dt><dd>Acute CVD bleed, left frontotemporal</dd></div>
+                <div data-field><dt>GCS</dt><dd>3</dd></div>
+                <div data-field><dt>Ventilator</dt><dd>Yes</dd></div>
+                <div data-field><dt>Brain death</dt><dd>Not yet</dd></div>
+                <div data-field class="wide"><dt>Clinical notes</dt><dd>Fixed dilated pupils; (-) corneal; (-) gag; (+) spontaneous breathing</dd></div>
+              </dl>
+              <p class="demo-done"><span data-filled>8</span> fields filled. You check, then send.</p>
+            </div>
           </div>
         </div>
-        <div class="found-body">
-          <p class="found-empty" id="found-empty">Nothing read yet. Paste a referral and press Read.</p>
-          <dl class="found-list" id="found-list"></dl>
-          <div class="found-missing" id="found-missing"></div>
+      </div>
+    </section>
+
+    <!-- Donor body map: pinned, scroll-driven -->
+    <section class="scrub donor" data-scrub="donor" aria-labelledby="donor-title">
+      <div class="scrub-sticky">
+        <div class="wrap donor-grid">
+          <div class="donor-copy">
+            <p class="kicker">A fully utilized donor</p>
+            <h2 id="donor-title">What one referral can become.</h2>
+            <p class="lede">When a family says yes and every organ and tissue can be used, one donor can save up to eight people and help many more live better.</p>
+            <div class="tally" aria-live="off">
+              <div><p class="num"><strong data-lives>8</strong></p><span>lives saved by organs</span></div>
+              <div><p class="num"><strong data-tissue>75</strong>+</p><span>people helped by tissue</span></div>
+            </div>
+            <p class="source">Figures: U.S. Health Resources and Services Administration, organdonor.gov. Results depend on medical suitability and family consent.</p>
+          </div>
+
+          <ol class="body-map" aria-label="Organs and tissue from one donor">
+            <li class="o-eyes" data-organ data-kind="tissue"><img src="assets/art/eyes.webp" width="320" height="320" alt="" loading="lazy" /><b>Corneas</b><span>restore sight</span></li>
+            <li class="o-lungs" data-organ data-lives="2"><img src="assets/art/lungs.webp" width="320" height="320" alt="" loading="lazy" /><b>2 lungs</b><span>end-stage lung disease</span></li>
+            <li class="o-heart" data-organ data-lives="1"><img src="assets/art/heart.webp" width="560" height="560" alt="" loading="lazy" /><b>Heart</b><span>end-stage heart failure</span></li>
+            <li class="o-liver" data-organ data-lives="1"><img src="assets/art/liver.webp" width="560" height="560" alt="" loading="lazy" /><b>Liver</b><span>liver failure, cirrhosis</span></li>
+            <li class="o-pancreas" data-organ data-lives="1"><img src="assets/art/pancreas.webp" width="320" height="320" alt="" loading="lazy" /><b>Pancreas</b><span>type 1 diabetes</span></li>
+            <li class="o-kidneys" data-organ data-lives="2"><img src="assets/art/kidneys.webp" width="560" height="560" alt="" loading="lazy" /><b>2 kidneys</b><span>off dialysis</span></li>
+            <li class="o-intestine" data-organ data-lives="1"><span class="no-art" aria-hidden="true">GI</span><b>Intestine</b><span>intestinal failure</span></li>
+            <li class="o-skin" data-organ data-kind="tissue"><img src="assets/art/skin.webp" width="320" height="320" alt="" loading="lazy" /><b>Skin</b><span>burn care</span></li>
+            <li class="o-bones" data-organ data-kind="tissue"><img src="assets/art/bones.webp" width="320" height="320" alt="" loading="lazy" /><b>Bone and valves</b><span>repair and surgery</span></li>
+          </ol>
         </div>
-        <div class="found-foot">
-          <button type="button" class="btn-ghost" id="clear-btn" hidden>Clear</button>
-          <a class="btn-primary" href="form.html" id="continue-btn">
-            <span id="continue-label">Type it in the form instead</span>
-            <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
-          </a>
+      </div>
+    </section>
+
+    <!-- Path from referral to recipients -->
+    <section class="path wrap" aria-labelledby="path-title">
+      <p class="kicker">How it works</p>
+      <h2 id="path-title">From your referral to the recipients.</h2>
+      <ol class="path-steps">
+        <li data-step><b>01</b><h3>You refer</h3><p>Paste or type the referral. Only your name, the patient and the hospital are required.</p></li>
+        <li data-step><b>02</b><h3>SHARE responds</h3><p>The coordinator on duty gets the transcribed referral by email at once and reviews the case.</p></li>
+        <li data-step><b>03</b><h3>Evaluation and family</h3><p>SHARE evaluates the patient with your team and approaches the family with care.</p></li>
+        <li data-step><b>04</b><h3>Lives continue</h3><p>With consent, organs and tissue are recovered and matched to waiting patients.</p></li>
+      </ol>
+    </section>
+
+    <!-- Final call to action -->
+    <section class="cta wrap" aria-labelledby="cta-title">
+      <div class="panel cta-panel">
+        <h2 id="cta-title">It starts with your referral.</h2>
+        <p>Thank you for thinking of SHARE. Every referral is reviewed by a coordinator.</p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="read.html">Refer a patient<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn-ghost" href="form.html">Type it in the form</a>
         </div>
-      </aside>
+      </div>
     </section>
   </main>
 
@@ -130,7 +190,6 @@
   <script src="js/vendor/anime.umd.min.js?v=4.5.0"></script>
   <script src="js/common.js?v=2"></script>
   <script src="js/motion.js?v=3"></script>
-  <script src="js/reader.js?v=1"></script>
-  <script src="js/reader-page.js?v=2"></script>
+  <script src="js/landing.js?v=1"></script>
 </body>
 </html>

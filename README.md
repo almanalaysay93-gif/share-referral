@@ -7,7 +7,8 @@ Each referral goes into the `Master 2026` tab of the PMOD Referral Master 2026 G
 
 | Part | File | Job |
 |---|---|---|
-| Reader page | `index.html`, `js/reader-page.js` | Step 1: paste a referral, the offline reader finds the details |
+| Landing page | `index.html`, `css/landing.css`, `js/landing.js` | Scroll story: transcription demo, fully utilized donor, referral path |
+| Reader page | `read.html`, `js/reader-page.js` | Step 1: paste a referral, the offline reader finds the details |
 | Form page | `form.html`, `js/form-page.js` | Step 2: check the details and send the referral |
 | Status page | `status.html`, `js/status-page.js` | Step 3: show the status of a reference |
 | Shared | `css/styles.css`, `js/common.js` | Theme, server calls, reader-to-form draft, 3D parallax hero |

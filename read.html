@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Read a referral · SHARE</title>
+  <meta name="description" content="Paste a brain death referral and the SHARE reader fills in the referral form for you." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#008037" />
+  <script>
+    // Old thank-you emails link to index.html#status?ref=SHR-XXXXXX. Send them to the status page.
+    (function () {
+      var m = /^#status\?ref=([A-Za-z0-9-]+)/.exec(location.hash);
+      if (m) location.replace('status.html?ref=' + encodeURIComponent(m[1].toUpperCase()));
+    })();
+  </script>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wdth,wght@62..125,500..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=9" />
+  <link rel="preload" as="image" href="assets/art/heart.webp" />
+  <script src="js/config.js?v=6"></script>
+  <script>if (!window.SHARE_CONFIG.ENDPOINT) document.documentElement.classList.add('is-demo');</script>
+</head>
+<body class="page-reader">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-send" viewBox="0 -960 960 960"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></symbol>
+    <symbol id="i-chat" viewBox="0 -960 960 960"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 -960 960 960"><path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/></symbol>
+    <symbol id="i-list" viewBox="0 -960 960 960"><path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#paste">Skip to the paste box</a>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./" aria-label="SHARE referral, home page">
+        <img src="assets/share_logo.webp" width="44" height="44" alt="SHARE logo" />
+        <img src="assets/spmc_logo.webp" width="33" height="44" alt="Southern Philippines Medical Center logo" />
+        <span class="brand-text"><b>SHARE</b><small>Brain death referral</small></span>
+      </a>
+      <nav class="stepnav" aria-label="Referral steps">
+        <a href="read.html" aria-current="page"><b>1</b><span>Read</span></a>
+        <a href="form.html"><b>2</b><span>Send</span></a>
+        <a href="status.html"><b>3</b><span>Status</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" data-hero aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="kicker">Step 1 of 3 · Referral reader</p>
+          <h1 id="hero-title">Paste the referral. We read it for you.</h1>
+          <p class="lede">Send it the way you send it on Messenger. The offline reader pulls out the patient, the hospital and your details. You check everything on the next page before it goes to SHARE.</p>
+          <p class="demo-banner">Preview mode: no referral leaves this browser.</p>
+        </div>
+        <div class="stage" aria-hidden="true">
+          <div class="scene">
+            <span class="layer plane"></span>
+            <span class="layer ring"></span>
+            <span class="layer numeral">01</span>
+            <img class="layer organ" src="assets/art/heart.webp" width="560" height="560" alt="" />
+            <svg class="layer pulse" viewBox="0 0 400 80"><path pathLength="1000" d="M0 50 H120 L135 50 L150 18 L165 72 L180 8 L195 50 H260 L272 50 L282 34 L292 50 H400"/></svg>
+            <span class="layer orbit"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="layer glass chip-1"><b class="dot-ok"></b><span>Heart: for end-stage heart failure</span></span>
+            <span class="layer glass chip-2"><b class="dot-ok"></b><span>1 donor can save up to <strong data-count="8">8</strong> lives</span></span>
+            <span class="layer glass chip-3"><b class="dot-wait"></b><span>Tissue can help <strong data-count="75">75</strong>+ more</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace wrap reader-grid" aria-label="Referral reader">
+      <div class="panel chat" aria-labelledby="chat-title">
+        <div class="panel-head">
+          <svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>
+          <div>
+            <h2 id="chat-title">Referral reader</h2>
+            <p class="panel-sub" id="reader-state">Offline reader. No AI. Nothing is sent from this page.</p>
+          </div>
+        </div>
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="sr-only" for="paste">Paste the referral text</label>
+          <textarea id="paste" rows="5" placeholder="Name: Juan Dela Cruz, 45/M, ICU 3&#10;Dx: Acute CVD bleed, GCS 3&#10;Declared brain dead 11/05/2026 3:40 PM&#10;Referred by Dr. Maria Santos 0917 123 4567"></textarea>
+          <div class="composer-row">
+            <button type="button" class="btn-ghost" id="sample-btn">Try a sample</button>
+            <button type="submit" class="btn-send" id="read-btn" aria-label="Read referral">
+              <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg>
+              <span>Read</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="panel found" aria-labelledby="found-title">
+        <div class="panel-head">
+          <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>
+          <div>
+            <h2 id="found-title">What the reader found</h2>
+            <p class="panel-sub">Kept in this browser tab only, until you send or clear it.</p>
+          </div>
+        </div>
+        <div class="found-body">
+          <p class="found-empty" id="found-empty">Nothing read yet. Paste a referral and press Read.</p>
+          <dl class="found-list" id="found-list"></dl>
+          <div class="found-missing" id="found-missing"></div>
+        </div>
+        <div class="found-foot">
+          <button type="button" class="btn-ghost" id="clear-btn" hidden>Clear</button>
+          <a class="btn-primary" href="form.html" id="continue-btn">
+            <span id="continue-label">Type it in the form instead</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p><b>SHARE</b> &middot; Southern Philippines Medical Center Human Advocate and Retrieval Effort, Davao City.</p>
+      <p>Patient details go only to the SHARE referral sheet and the SHARE team's email. The page is not indexed by search engines.</p>
+    </div>
+  </footer>
+
+  <script src="js/vendor/anime.umd.min.js?v=4.5.0"></script>
+  <script src="js/common.js?v=2"></script>
+  <script src="js/motion.js?v=3"></script>
+  <script src="js/reader.js?v=1"></script>
+  <script src="js/reader-page.js?v=2"></script>
+</body>
+</html>

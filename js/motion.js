@@ -51,6 +51,49 @@
     });
   }
 
+  if (!still) brandMotion();
+
+  // Header brand: the SPMC logo then the SHARE logo spring in, the SHARE letters rise, and the subtitle
+  // slides in. The full intro plays once per browser tab; later pages only get the idle heartbeat.
+  // Every 9 s the SHARE logo beats twice; hovering the brand tilts both logos.
+  function brandMotion() {
+    const brand = document.querySelector('.brand');
+    if (!brand) return;
+    const spmc = brand.querySelector('.brand-spmc');
+    const share = brand.querySelector('.brand-share');
+    const word = brand.querySelector('.brand-text b');
+    const sub = brand.querySelector('.brand-text small');
+    let first = true;
+    try { first = !sessionStorage.getItem('share-brand-intro'); sessionStorage.setItem('share-brand-intro', '1'); } catch (e) { /* storage blocked */ }
+
+    if (first) {
+      const spring = A.spring({ bounce: 0.38, duration: 900 });
+      const tl = A.createTimeline({ defaults: { ease: spring } });
+      [spmc, share].forEach((logo, i) => {
+        if (logo) tl.add(logo, { scale: [0.3, 1], rotate: [i ? 14 : -14, 0], opacity: [0, 1] }, i * 140);
+      });
+      if (word && word.offsetParent) {
+        const split = splitText(word, { chars: true });
+        tl.add(split.chars, { y: ['110%', '0%'], opacity: [0, 1], delay: stagger(45) }, 220);
+      }
+      if (sub && sub.offsetParent) tl.add(sub, { x: [-12, 0], opacity: [0, 1], duration: 600, ease: 'out(3)' }, 560);
+    }
+
+    if (share) {
+      setInterval(() => {
+        if (document.hidden) return;
+        A.animate(share, { scale: [1, 1.12, 1, 1.06, 1], duration: 900, ease: 'out(2)' });
+      }, 9000);
+    }
+    brand.addEventListener('mouseenter', () => {
+      if (spmc) A.animate(spmc, { rotate: -6, scale: 1.06, duration: 420, ease: A.spring({ bounce: 0.4, duration: 420 }) });
+      if (share) A.animate(share, { rotate: 6, scale: 1.06, duration: 420, ease: A.spring({ bounce: 0.4, duration: 420 }) });
+    });
+    brand.addEventListener('mouseleave', () => {
+      [spmc, share].forEach((logo) => { if (logo) A.animate(logo, { rotate: 0, scale: 1, duration: 420, ease: 'out(3)' }); });
+    });
+  }
+
   const hero = document.querySelector('[data-hero]');
   if (!hero || still) return; // Static title, chips and numbers stay as written in the HTML.
 

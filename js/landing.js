@@ -35,7 +35,8 @@
 
   function progress(section) {
     const rect = section.getBoundingClientRect();
-    const travel = rect.height - window.innerHeight + 68;
+    const bar = document.querySelector('.topbar');
+    const travel = rect.height - window.innerHeight + (bar ? bar.offsetHeight : 68);
     return Math.min(1, Math.max(0, -rect.top / Math.max(1, travel)));
   }
 

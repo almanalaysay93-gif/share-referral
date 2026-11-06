@@ -7,7 +7,7 @@
 
 /* Pinned sections */
 .scrub { position: relative; height: 260vh; }
-.scrub-sticky { position: sticky; top: 68px; height: calc(100vh - 68px); display: flex; align-items: center; overflow: hidden; }
+.scrub-sticky { position: sticky; top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); display: flex; align-items: center; overflow: hidden; }
 .scrub h2, .path h2, .cta h2 { margin: 0; font-stretch: 115%; font-weight: 900; font-size: clamp(1.6rem, 2.9vw, 2.4rem); line-height: 1.05; color: var(--green-ink); }
 
 /* Demo */

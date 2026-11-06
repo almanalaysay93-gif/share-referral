@@ -231,3 +231,12 @@ Checks:
 - The first chip names the organ and the disease it treats, and changes with the organ.
 - The loop pauses while the hero is off screen or the tab is hidden. With reduced motion the heart stays still.
 - Check: in Chrome over 10.5 s the sequence ran heart, lungs, liver, kidneys, the distortion peaked at 61.9, and the chip read "2 kidneys: free 2 people from dialysis". No console errors.
+
+## Change on 2026-11-06: bigger animated header brand
+
+- The SPMC logo now comes first and the SHARE logo second on every page.
+- Desktop: logos 56 px high, "SHARE" 28 px, subtitle 0.92 rem, header 84 px. Phones keep 44 px logos and a 68 px header so the four-step nav still fits.
+- The header height is one CSS variable (`--topbar-h`), used by the scroll padding, the sticky reader panel and the pinned landing sections; `js/landing.js` reads the real header height.
+- Anime.js intro, once per browser tab: the SPMC logo then the SHARE logo spring in from 30 percent scale with a small turn, the SHARE letters rise, and the subtitle slides in. Every 9 s the SHARE logo beats twice. Hovering the brand tilts both logos.
+- Reduced motion: no intro, no heartbeat, no tilt.
+- Checks: Chrome at 1440 x 900 showed SPMC then SHARE at 56 px, the logos settled to scale 1 by 1.5 s, no console errors. At 390 x 844 the logos were 44 px, the brand ended at 105 px and the nav started at 133 px, no horizontal overflow.

@@ -115,3 +115,4 @@
   .scrub-sticky { position: static; height: auto; padding: 48px 0; }
   .demo-text.is-typing::after { display: none; }
 }
+.path-intro { margin: 8px 0 0; color: var(--muted); max-width: 60ch; }

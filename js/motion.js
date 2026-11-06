@@ -55,6 +55,14 @@
   if (!hero || still) return; // Static title, chips and numbers stay as written in the HTML.
 
   const title = hero.querySelector('h1');
+
+  // Landing title: spring word reveal, ribbon underline, heartbeat on "eight", then a slow colour sheen.
+  if (document.body.classList.contains('page-landing')) {
+    landingTitle(title);
+    chipsAndCounts();
+    return;
+  }
+
   const split = splitText(title, { words: { wrap: 'clip' }, chars: true });
   hero.classList.add('is-split');
 
@@ -81,6 +89,45 @@
     });
   }
 
+  chipsAndCounts();
+
+  function landingTitle(h1) {
+    const split = splitText(h1, { words: true });
+    // splitText rebuilds the title, so find the underline only after the split.
+    const line = h1.querySelector('.hl-line path');
+    hero.classList.add('is-split');
+    const words = split.words;
+    const eight = words.find((w) => /^eight$/i.test(w.textContent.trim()));
+    const spring = A.spring({ bounce: 0.32, duration: 760 });
+    if (line) line.style.strokeDashoffset = '1';
+
+    const tl = A.createTimeline({ defaults: { ease: spring } });
+    tl.add(words, {
+      y: { from: '0.55em' },
+      opacity: { from: 0 },
+      filter: { from: 'blur(10px)', to: 'blur(0px)' },
+      delay: stagger(70),
+    });
+    if (line) {
+      tl.add(line, { strokeDashoffset: [1, 0], duration: 900, ease: 'inOut(3)' }, '-=380');
+    }
+    if (eight) {
+      // Two quick beats, like a pulse.
+      tl.add(eight, { scale: [1, 1.14, 1, 1.08, 1], duration: 900, ease: 'out(2)' }, '-=520');
+    }
+    tl.then(() => {
+      animate(words, {
+        color: ['#0d3b21', '#008037', '#0d3b21'],
+        duration: 1100,
+        ease: 'inOut(2)',
+        delay: stagger(60),
+        loop: true,
+        loopDelay: 5200,
+      });
+    });
+  }
+
+  function chipsAndCounts() {
   // 3. Chips fade in after the title, one after another.
   animate(hero.querySelectorAll('.glass'), {
     opacity: { from: 0 },
@@ -104,4 +151,5 @@
       onUpdate: () => { node.textContent = String(counter.value); },
     });
   });
+  }
 })();

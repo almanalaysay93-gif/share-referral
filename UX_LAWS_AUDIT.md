@@ -136,3 +136,21 @@ Below 1000 px wide, below 700 px high, with reduced motion, or without JavaScrip
 - `read.html` read the sample and showed 15 found fields, and its Continue link goes to `form.html`.
 - No console errors or warnings.
 - The figures 8 and 75+ come from organdonor.gov and have no SHARE clinical sign-off.
+
+## Change on 2026-11-06: flowing ribbon and landing title
+
+- `js/ribbon.js` draws one fixed SVG ribbon behind every page: a wide sage band, a green band and a thin deep-green thread.
+- The ribbon waves over time, travels from the top left to the bottom right as the page scrolls, and draws further along as the doctor scrolls the landing page.
+- On the landing page it lifts with the transcription demo and widens its waves with the donor body map, through `window.SHARE_STORY` from `js/landing.js`.
+- The wave phase is kept in `sessionStorage`, so the ribbon continues where it was on the next page.
+- On the Read, Send and Status pages the ribbon is at 45 percent opacity behind the panels, so the form stays easy to read.
+- The landing title uses Anime.js 4.5.0 `splitText`, `createTimeline` and `spring`: the words rise and unblur with a stagger, a green underline draws under "eight lives", "eight" beats twice, and a slow green colour sheen repeats every few seconds.
+- Reduced motion: the ribbon stays still, the title is not split, and the underline shows in full.
+
+Checks:
+
+- Chrome at 1440 x 900: the underline offset went from 1 to 0 between 1.5 s and 2.6 s, "eight" reached scale 1.05, and the ribbon centre moved from y 82 to y 453 at the donor section.
+- The page ran at about 100 frames per second on this PC during a 2-second count. This is not a phone measurement.
+- At 390 x 844 there was no horizontal overflow.
+- Lighthouse mobile on the landing page: accessibility 100, best practices 100.
+- No console errors or warnings.

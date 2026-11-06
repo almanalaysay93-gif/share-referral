@@ -84,8 +84,10 @@
   let frame = 0;
   function tick() {
     frame = 0;
-    renderDemo(progress(demo));
-    renderDonor(progress(donor));
+    const story = { demo: progress(demo), donor: progress(donor) };
+    window.SHARE_STORY = story; // read by js/ribbon.js each frame
+    renderDemo(story.demo);
+    renderDonor(story.donor);
   }
   function request() { if (!frame && root.classList.contains('is-scrub')) frame = requestAnimationFrame(tick); }
 

@@ -11,7 +11,7 @@
 .scrub h2, .path h2, .cta h2 { margin: 0; font-stretch: 115%; font-weight: 900; font-size: clamp(1.6rem, 2.9vw, 2.4rem); line-height: 1.05; color: var(--green-ink); }
 
 /* Demo */
-.demo { background: linear-gradient(180deg, var(--mist) 0%, #eef4e7 100%); }
+.demo { background: linear-gradient(180deg, rgba(244, 248, 239, 0.55) 0%, rgba(238, 244, 231, 0.7) 100%); }
 .demo-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(20px, 4vw, 48px); align-items: center; }
 .facts { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 14px; }
 .facts li { display: flex; gap: 12px; align-items: flex-start; font-size: 0.98rem; }
@@ -41,7 +41,7 @@
 .is-scrub .demo-done:not(.is-on) { opacity: 0; }
 
 /* Donor */
-.donor { background: var(--paper); }
+.donor { background: rgba(255, 255, 255, 0.5); }
 .donor-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: clamp(20px, 4vw, 56px); align-items: center; }
 .tally { display: flex; gap: 28px; margin-top: 22px; flex-wrap: wrap; }
 .tally div { display: flex; flex-direction: column; }

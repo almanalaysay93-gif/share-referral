@@ -11,7 +11,7 @@ Evidence: Chrome at 1440 x 900 and 390 x 844 (mobile, touch), Lighthouse mobile 
 | 3 Jakob | Compliant | The chat looks like Messenger. The step nav uses the common numbered-steps pattern. |
 | 4 Miller | Compliant | The form keeps three groups: Patient, Clinical, Referring doctor. |
 | 5 Tesler | Compliant | The offline reader does the data entry. The doctor only checks the green fields. |
-| 6 Aesthetic-usability | Compliant | SHARE green theme with a 3D organ hero per page. Text stays above the art and readable. |
+| 6 Aesthetic-usability | Compliant | SHARE green theme with a 3D organ hero per page: heartbeat line, orbit dots and glass chips that state facts about the step. Text stays above the art and readable. |
 | 7 Doherty | Partial | The reader and page changes respond at once. A submit or status check waits for Apps Script (about 2 to 6 s). A spinner and "Sending" or "Checking" text cover the wait. The server time is outside the page's control. |
 | 8 Peak-end | Compliant | The thank-you screen names the doctor, shows the reference with a Copy button, and links to the status page. |
 | 9 Serial position | Compliant | Step 1 Read is first in the nav. The send button is last in the form. |
@@ -26,7 +26,7 @@ Evidence: Chrome at 1440 x 900 and 390 x 844 (mobile, touch), Lighthouse mobile 
 1. On phones the brand text collided with the step nav. The brand text is now hidden below 720 px and the logos stay.
 2. On phones the hero art was taller than its stage. The organ, ring and leaves now scale down below 720 px.
 3. The status steps showed a box inside a box. The inner border was removed.
-4. The leaf images had hard square edges. A radial mask now softens them.
+4. On 2026-11-06 the leaves were replaced by a heartbeat line, orbit dots and glass chips. Chip text states facts only, never a fake status. On phones only one chip and the pulse stay.
 5. The reader summary showed ISO dates. It now shows dates such as "5 Nov 2026, 3:40 pm".
 
 ## Other checks

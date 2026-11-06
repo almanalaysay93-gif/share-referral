@@ -118,6 +118,9 @@
     let offset = 0;       // final results of this session already kept in `base` (after a typed edit)
     let interim = '';     // unfinished words currently shown at the end of the box
     let written = '';     // what this code last wrote into the box
+    let lastFinals = [];  // cleaned final phrases of the current session
+    let carry = '';       // last final phrase of the previous session
+    let dropCarry = false;
 
     const setLive = (live) => {
       mic.classList.toggle('is-live', live);
@@ -141,13 +144,32 @@
 
       rec.onresult = (event) => {
         // Build the text from every result in this session, so a result is never counted twice.
-        const finals = [];
+        const raw = [];
         let pending = '';
         for (let i = 0; i < event.results.length; i++) {
           const piece = event.results[i][0].transcript.trim();
-          if (event.results[i].isFinal) finals.push(piece);
+          if (event.results[i].isFinal) raw.push(piece);
           else pending = piece;
         }
+        // Chrome can resend the same words as results that grow ("hello", "hello doctors", ...) or repeat
+        // ("possible", "possible"). Keep one copy: a longer version replaces the shorter one, a repeat is dropped.
+        const finals = [];
+        raw.forEach((s) => {
+          if (!s) return;
+          const last = finals.length ? finals[finals.length - 1] : null;
+          if (last === null) { finals.push(s); return; }
+          const a = last.toLowerCase();
+          const b = s.toLowerCase();
+          if (b === a || a.startsWith(b)) return;
+          if (b.startsWith(a)) { finals[finals.length - 1] = s; return; }
+          finals.push(s);
+        });
+        // A new session can hear the last words of the previous one again: drop that repeat once.
+        if (dropCarry && finals.length) {
+          if (carry && finals[0].toLowerCase() === carry.toLowerCase()) finals.shift();
+          dropCarry = false;
+        }
+        lastFinals = finals;
         // The doctor typed into the box: keep their text and continue after the finals heard so far.
         if (paste.value !== written) {
           base = paste.value.replace(/\s*$/, '\n');
@@ -170,6 +192,9 @@
 
       rec.onend = () => {
         rec = null;
+        carry = lastFinals.length ? lastFinals[lastFinals.length - 1] : '';
+        dropCarry = !!carry;
+        lastFinals = [];
         if (wanted) {
           try { begin(); rec.start(); return; } catch (err) { wanted = false; }
         }

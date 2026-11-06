@@ -266,3 +266,10 @@ Checks:
 
 - The text is now rebuilt from all results in the current session, not from a saved position. Unfinished words are removed from the box before a restart.
 - Not reproduced: a single spoken "hello" repeating. The stand-in engine repeats a word only when the test asks it to, so the real cause is not confirmed. Needs a test on the phone.
+
+## Change on 2026-11-06: Speak growing repeats
+
+- Chrome resends speech as growing phrases ("hello", "hello doctors", ...) and repeated words ("possible possible"). A longer copy now replaces the shorter one, an exact repeat is dropped, and a new session drops a repeat of the previous session's last phrase.
+- Checked in Chrome with a stand-in engine: the growing sequence ended as "hello doctors referring patient maria santos", and a repeated phrase after a restart was dropped.
+- Trade-off: a doctor who truly says a word twice in a row, such as "no no", may get it once. Check the text before pressing Read.
+- Not checked on a real phone.

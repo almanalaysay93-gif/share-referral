@@ -53,7 +53,7 @@
     const count = 32;
     for (let i = 0; i < count; i++) {
       const dot = document.createElement('i');
-      // Mix of green dots, sage dots and small sparks.
+      // Mix of pink dots, blush dots and small sparks.
       dot.className = i % 4 === 0 ? 'is-sage' : i % 5 === 0 ? 'is-spark' : '';
       host.appendChild(dot);
       dots.push(dot);

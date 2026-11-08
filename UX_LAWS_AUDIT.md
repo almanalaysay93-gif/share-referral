@@ -280,3 +280,10 @@ Checks:
 - Primary buttons are deep blue with white text (contrast well above 4.5:1). Light buttons are blush pink with deep blue text.
 - The organ artwork (PNG images) keeps its green. It is a picture, not a colour token. Recolouring it needs a separate decision.
 - Checks: hero renders in the new palette, primary button computes to rgb(0, 33, 30), no horizontal overflow at 1440 px.
+
+## Change on 2026-11-09: all green replaced
+
+- Organ art (heart, lungs, liver, kidneys, pancreas, corneas, skin, bones) and the ribbon background images are recoloured to a deep blue ramp from #001226 to #26689F. Alpha is kept, so the cut-out edges stay as they were.
+- Ribbons, glows, dots, sparks, underlines and the colour wave in the title use bubblegum pink #FB039E or blush peach #FD91CC.
+- Shadows and lips use deep blue or pink tints. No green colour remains in the CSS or JS (checked by scan).
+- Chrome caches the old images under the same file names. A hard reload (Ctrl + Shift + R) shows the blue organs.

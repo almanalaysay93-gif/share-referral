@@ -54,7 +54,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-areas: ". eyes ." "lungs heart skin" "liver pancreas bones" "kidneys intestine ."; }
 .body-map::before { content: ""; position: absolute; inset: 0 18% 0; border-radius: 120px 120px 60px 60px; z-index: -1;
-  background: radial-gradient(60% 40% at 50% 30%, var(--sage-soft), transparent 70%), linear-gradient(180deg, #FFF5FA, #e8efdf);
+  background: radial-gradient(60% 40% at 50% 30%, var(--sage-soft), transparent 70%), linear-gradient(180deg, #FFF5FA, #FFE9F5);
   box-shadow: inset 4px 4px 14px rgba(0, 33, 30, 0.08), inset -4px -4px 12px rgba(255, 255, 255, 0.9); }
 .body-map li { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 8px 12px; border-radius: 20px;
   background: rgba(255, 255, 255, 0.86); box-shadow: 5px 6px 14px rgba(0, 33, 30, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.9);

@@ -155,7 +155,7 @@
   }
 
   // Landing section headings: letters rise on a spring when the heading scrolls into view, the small
-  // kicker above settles from wide letter spacing, then a green sheen runs once through the words.
+  // kicker above settles from wide letter spacing, then a pink sheen runs once through the words.
   function sectionTitles() {
     const heads = Array.from(document.querySelectorAll('main section:not(.hero) h2'));
     if (!heads.length || !('IntersectionObserver' in window)) return;
@@ -189,7 +189,7 @@
         delay: stagger(16),
       }, kicker ? '-=520' : 0);
       tl.add(split.words, {
-        color: ['#00211E', '#00211E', '#00211E'],
+        color: ['#00211E', '#FB039E', '#00211E'],
         duration: 900,
         ease: 'inOut(2)',
         delay: stagger(70),
@@ -211,10 +211,10 @@
     onComplete: wave,
   });
 
-  // 2. A slow green wave runs through the title every few seconds.
+  // 2. A slow pink wave runs through the title every few seconds.
   function wave() {
     animate(split.chars, {
-      color: ['#00211E', '#00211E', '#00211E'],
+      color: ['#00211E', '#FB039E', '#00211E'],
       duration: 900,
       ease: 'inOut(2)',
       delay: stagger(28),
@@ -251,7 +251,7 @@
     }
     tl.then(() => {
       animate(words, {
-        color: ['#00211E', '#00211E', '#00211E'],
+        color: ['#00211E', '#FB039E', '#00211E'],
         duration: 1100,
         ease: 'inOut(2)',
         delay: stagger(60),

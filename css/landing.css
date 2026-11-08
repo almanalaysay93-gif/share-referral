@@ -21,18 +21,18 @@
 .demo-chat, .demo-form { padding: 16px 18px 18px; min-height: 380px; }
 .demo-label { margin: 0 0 10px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }
 .demo-text { margin: 0; white-space: pre-wrap; word-break: break-word; font: 0.82rem/1.55 ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--ink);
-  background: #e5eedc; border-radius: 16px; padding: 12px 14px; min-height: 300px;
-  box-shadow: inset 3px 3px 8px rgba(13, 59, 33, 0.1), inset -2px -2px 6px rgba(255, 255, 255, 0.9); }
+  background: #FFE9F4; border-radius: 16px; padding: 12px 14px; min-height: 300px;
+  box-shadow: inset 3px 3px 8px rgba(0, 33, 30, 0.1), inset -2px -2px 6px rgba(255, 255, 255, 0.9); }
 .demo-text.is-typing::after { content: ""; display: inline-block; width: 7px; height: 1.05em; margin-left: 1px; vertical-align: -2px; background: var(--green); animation: caret 0.9s steps(1) infinite; }
 .demo-arrow { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff;
-  box-shadow: 0 4px 0 #004e1f; transform: translateX(calc((var(--p, 1) - 0.5) * 8px)); }
+  box-shadow: 0 4px 0 #000F0D; transform: translateX(calc((var(--p, 1) - 0.5) * 8px)); }
 .demo-fields { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.demo-fields > div { padding: 8px 10px; border-radius: 12px; background: #f7faf3; border: 1.5px solid transparent;
-  box-shadow: inset 2px 2px 6px rgba(13, 59, 33, 0.08); transition: background-color 260ms ease, border-color 260ms ease, transform 320ms var(--ease-out); }
+.demo-fields > div { padding: 8px 10px; border-radius: 12px; background: #FFF8FC; border: 1.5px solid transparent;
+  box-shadow: inset 2px 2px 6px rgba(0, 33, 30, 0.08); transition: background-color 260ms ease, border-color 260ms ease, transform 320ms var(--ease-out); }
 .demo-fields .wide { grid-column: span 2; }
 .demo-fields dt { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .demo-fields dd { margin: 2px 0 0; font-weight: 700; color: var(--green-ink); font-size: 0.92rem; transition: opacity 260ms ease; }
-.demo-fields > div.is-on { background: #eaf6ea; border-color: #7cb98c; }
+.demo-fields > div.is-on { background: #FFE9F5; border-color: #FB8CC9; }
 .demo-done { margin: 14px 0 0; font-weight: 700; color: var(--green); }
 
 /* Hidden start states only while a section is pinned and motion is allowed. Without JS everything shows filled. */
@@ -54,16 +54,16 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-areas: ". eyes ." "lungs heart skin" "liver pancreas bones" "kidneys intestine ."; }
 .body-map::before { content: ""; position: absolute; inset: 0 18% 0; border-radius: 120px 120px 60px 60px; z-index: -1;
-  background: radial-gradient(60% 40% at 50% 30%, var(--sage-soft), transparent 70%), linear-gradient(180deg, #f4f8ef, #e8efdf);
-  box-shadow: inset 4px 4px 14px rgba(13, 59, 33, 0.08), inset -4px -4px 12px rgba(255, 255, 255, 0.9); }
+  background: radial-gradient(60% 40% at 50% 30%, var(--sage-soft), transparent 70%), linear-gradient(180deg, #FFF5FA, #e8efdf);
+  box-shadow: inset 4px 4px 14px rgba(0, 33, 30, 0.08), inset -4px -4px 12px rgba(255, 255, 255, 0.9); }
 .body-map li { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 8px 12px; border-radius: 20px;
-  background: rgba(255, 255, 255, 0.86); box-shadow: 5px 6px 14px rgba(13, 59, 33, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.86); box-shadow: 5px 6px 14px rgba(0, 33, 30, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.9);
   transition: opacity 360ms ease, filter 360ms ease, transform 420ms var(--ease-out), box-shadow 360ms ease; }
 .body-map img, .no-art { width: 64px; height: 64px; object-fit: contain; }
 .no-art { display: grid; place-items: center; border-radius: 50%; background: var(--sage-soft); color: var(--green-deep); font-family: var(--font-display); font-weight: 900; }
 .body-map b { margin-top: 4px; font-size: 0.9rem; color: var(--green-ink); }
 .body-map li > span:last-child { font-size: 0.76rem; color: var(--muted); line-height: 1.3; }
-.body-map li.is-on { box-shadow: 0 0 0 2px var(--green), 5px 6px 18px rgba(0, 128, 55, 0.22); }
+.body-map li.is-on { box-shadow: 0 0 0 2px var(--green), 5px 6px 18px rgba(251, 3, 158, 0.22); }
 .body-map li[data-kind="tissue"].is-on { box-shadow: 0 0 0 2px #c79a1a, 5px 6px 18px rgba(199, 154, 26, 0.22); }
 .is-scrub .body-map li:not(.is-on) { opacity: 0.38; filter: grayscale(1); transform: scale(0.94); }
 .o-eyes { grid-area: eyes; } .o-lungs { grid-area: lungs; } .o-heart { grid-area: heart; } .o-skin { grid-area: skin; }
@@ -73,8 +73,8 @@
 /* Path */
 .path { padding-top: clamp(56px, 8vw, 96px); padding-bottom: 32px; }
 .path-steps { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; counter-reset: none; }
-.path-steps li { padding: 20px; border-radius: 24px; background: linear-gradient(180deg, #fff, #f4f8ef);
-  box-shadow: inset 0 1px 0 #fff, 7px 9px 18px rgba(13, 59, 33, 0.1), -6px -6px 14px rgba(255, 255, 255, 0.92); }
+.path-steps li { padding: 20px; border-radius: 24px; background: linear-gradient(180deg, #fff, #FFF5FA);
+  box-shadow: inset 0 1px 0 #fff, 7px 9px 18px rgba(0, 33, 30, 0.1), -6px -6px 14px rgba(255, 255, 255, 0.92); }
 .path-steps b { font-family: var(--font-display); font-weight: 900; font-stretch: 125%; color: var(--green); font-size: 1.4rem; }
 .path-steps h3 { margin: 8px 0 6px; font-family: var(--font-display); font-stretch: 110%; color: var(--green-ink); font-size: 1.1rem; }
 .path-steps p { margin: 0; font-size: 0.92rem; }

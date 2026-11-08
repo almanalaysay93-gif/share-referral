@@ -13,7 +13,7 @@
   const BANDS = [
     { width: 120, color: 'url(#rb-sage)', opacity: 0.55, amp: 0.16, freq: 1.1, speed: 0.18, lift: 0.0 },
     { width: 46, color: 'url(#rb-green)', opacity: 0.38, amp: 0.12, freq: 1.6, speed: 0.26, lift: 0.05 },
-    { width: 6, color: '#00612a', opacity: 0.45, amp: 0.1, freq: 2.2, speed: 0.34, lift: -0.04 },
+    { width: 6, color: '#FB039E', opacity: 0.45, amp: 0.1, freq: 2.2, speed: 0.34, lift: -0.04 },
   ];
   const POINTS = 64;
 
@@ -24,10 +24,10 @@
   svg.setAttribute('preserveAspectRatio', 'none');
   svg.innerHTML =
     '<defs>' +
-    '<linearGradient id="rb-sage" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#cdd8be" stop-opacity="0"/>' +
-    '<stop offset=".3" stop-color="#cdd8be"/><stop offset=".7" stop-color="#b9cfa6"/><stop offset="1" stop-color="#cdd8be" stop-opacity="0"/></linearGradient>' +
-    '<linearGradient id="rb-green" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#008037" stop-opacity="0"/>' +
-    '<stop offset=".25" stop-color="#008037"/><stop offset=".75" stop-color="#2f9a5a"/><stop offset="1" stop-color="#008037" stop-opacity="0"/></linearGradient>' +
+    '<linearGradient id="rb-sage" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#FD91CC" stop-opacity="0"/>' +
+    '<stop offset=".3" stop-color="#FD91CC"/><stop offset=".7" stop-color="#FFB8DE"/><stop offset="1" stop-color="#FD91CC" stop-opacity="0"/></linearGradient>' +
+    '<linearGradient id="rb-green" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#00211E" stop-opacity="0"/>' +
+    '<stop offset=".25" stop-color="#00211E"/><stop offset=".75" stop-color="#FB039E"/><stop offset="1" stop-color="#00211E" stop-opacity="0"/></linearGradient>' +
     '</defs>';
   const paths = BANDS.map((band) => {
     const p = document.createElementNS(NS, 'path');
@@ -61,11 +61,11 @@
   const STRANDS = [
     { group: 0, width: 64, color: 'url(#rb-sage)', opacity: 0.5, offset: -22, ripple: 0.012 },
     { group: 0, width: 26, color: 'url(#rb-green)', opacity: 0.4, offset: 0, ripple: 0.014 },
-    { group: 0, width: 5, color: '#00612a', opacity: 0.5, offset: 22, ripple: 0.018 },
-    { group: 0, width: 2, color: '#008037', opacity: 0.45, offset: 44, ripple: 0.024 },
+    { group: 0, width: 5, color: '#FB039E', opacity: 0.5, offset: 22, ripple: 0.018 },
+    { group: 0, width: 2, color: '#00211E', opacity: 0.45, offset: 44, ripple: 0.024 },
     { group: 1, width: 38, color: 'url(#rb-sage)', opacity: 0.42, offset: -14, ripple: 0.016 },
     { group: 1, width: 12, color: 'url(#rb-green)', opacity: 0.35, offset: 8, ripple: 0.02 },
-    { group: 1, width: 2, color: '#00612a', opacity: 0.4, offset: 26, ripple: 0.028 },
+    { group: 1, width: 2, color: '#FB039E', opacity: 0.4, offset: 26, ripple: 0.028 },
   ];
   const PARTICLES = 26;
   const LONG_POINTS = 180;

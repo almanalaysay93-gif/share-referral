@@ -189,7 +189,7 @@
         delay: stagger(16),
       }, kicker ? '-=520' : 0);
       tl.add(split.words, {
-        color: ['#0d3b21', '#008037', '#0d3b21'],
+        color: ['#00211E', '#00211E', '#00211E'],
         duration: 900,
         ease: 'inOut(2)',
         delay: stagger(70),
@@ -214,7 +214,7 @@
   // 2. A slow green wave runs through the title every few seconds.
   function wave() {
     animate(split.chars, {
-      color: ['#0d3b21', '#008037', '#0d3b21'],
+      color: ['#00211E', '#00211E', '#00211E'],
       duration: 900,
       ease: 'inOut(2)',
       delay: stagger(28),
@@ -251,7 +251,7 @@
     }
     tl.then(() => {
       animate(words, {
-        color: ['#0d3b21', '#008037', '#0d3b21'],
+        color: ['#00211E', '#00211E', '#00211E'],
         duration: 1100,
         ease: 'inOut(2)',
         delay: stagger(60),

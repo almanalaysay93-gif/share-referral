@@ -273,3 +273,10 @@ Checks:
 - Checked in Chrome with a stand-in engine: the growing sequence ended as "hello doctors referring patient maria santos", and a repeated phrase after a restart was dropped.
 - Trade-off: a doctor who truly says a word twice in a row, such as "no no", may get it once. Check the text before pressing Read.
 - Not checked on a real phone.
+
+## Change on 2026-11-09: new colour scheme
+
+- Palette: deep blue #00211E for text, headings, buttons and structure. Bubblegum pink #FB039E for accents, ribbons, dots, underlines and focus glows. Blush peach #FD91CC and pink tints for soft surfaces and sage areas.
+- Primary buttons are deep blue with white text (contrast well above 4.5:1). Light buttons are blush pink with deep blue text.
+- The organ artwork (PNG images) keeps its green. It is a picture, not a colour token. Recolouring it needs a separate decision.
+- Checks: hero renders in the new palette, primary button computes to rgb(0, 33, 30), no horizontal overflow at 1440 px.

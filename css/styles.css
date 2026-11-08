@@ -95,7 +95,7 @@ a { color: var(--green-deep); }
 .glass strong { font-family: var(--font-display); font-weight: 900; font-stretch: 115%; font-size: 1.25em; color: var(--green); font-variant-numeric: tabular-nums; }
 .glass b { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .dot-ok { background: var(--green); box-shadow: 0 0 0 3px rgba(251, 3, 158, 0.18); }
-.dot-wait { background: #d9a400; box-shadow: 0 0 0 3px rgba(217, 164, 0, 0.2); }
+.dot-wait { background: #FB039E; box-shadow: 0 0 0 3px rgba(251, 3, 158, 0.2); }
 .dot-idle { background: var(--line); }
 .chip-1 { left: 0; top: 14%; transform: translateZ(140px) translateY(calc(var(--p) * -130px)); }
 .chip-2 { right: 0; bottom: 18%; transform: translateZ(170px) translateY(calc(var(--p) * -180px)); }

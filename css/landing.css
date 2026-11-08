@@ -64,7 +64,7 @@
 .body-map b { margin-top: 4px; font-size: 0.9rem; color: var(--green-ink); }
 .body-map li > span:last-child { font-size: 0.76rem; color: var(--muted); line-height: 1.3; }
 .body-map li.is-on { box-shadow: 0 0 0 2px var(--green), 5px 6px 18px rgba(251, 3, 158, 0.22); }
-.body-map li[data-kind="tissue"].is-on { box-shadow: 0 0 0 2px #c79a1a, 5px 6px 18px rgba(199, 154, 26, 0.22); }
+.body-map li[data-kind="tissue"].is-on { box-shadow: 0 0 0 2px #FB039E, 5px 6px 18px rgba(251, 3, 158, 0.22); }
 .is-scrub .body-map li:not(.is-on) { opacity: 0.38; filter: grayscale(1); transform: scale(0.94); }
 .o-eyes { grid-area: eyes; } .o-lungs { grid-area: lungs; } .o-heart { grid-area: heart; } .o-skin { grid-area: skin; }
 .o-liver { grid-area: liver; } .o-pancreas { grid-area: pancreas; } .o-bones { grid-area: bones; }

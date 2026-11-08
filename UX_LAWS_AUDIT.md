@@ -298,3 +298,10 @@ Checks:
 
 - Replaced the simple SVG with an engraving-style intestine (`assets/art/intestine.webp`, 560 x 560, transparent). It uses the same deep blue ink as the other organ art.
 - Drawn in code (Python imaging). The `/hyperframes` skill is built for video, so it was not used to draw the still image. A medical or licensed anatomy image would still be better for a clinical audience.
+
+## Change on 2026-11-09: intestine from the reference photo (first pass)
+
+- Source reference: `D:\Downloads\small_intestine_2.jpg` (stomach, duodenal loop, coiled small bowel).
+- Built as a procedural Three.js model (`tools/intestine/render.html`): a tube along a control path with haustral-style radius variation, a stomach pouch, and deep blue material. Rendered in headless Chrome at 1120 px and saved to `assets/art/intestine.png` and `.webp` (560 px).
+- Not done: the full img2threejs staged gates (state init, sculpt spec, pass reviews, comparison sheets). This is a first pass.
+- Known defects: small flaps where the tube bends, and no haustral folds. Next pass: fix the frame twist at bends, and add folds and the duodenum's C-curve.

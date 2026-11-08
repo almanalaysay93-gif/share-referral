@@ -2,42 +2,112 @@
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script></head>
 <body><script type="module">
 import * as THREE from 'three';
-// Reference: small intestine (stomach, duodenum loop, jejunum/ileum coils) from small_intestine_2.jpg.
-// Procedural tube along a control path; radius varies with the bowel's folds; deep blue material.
-const W=1120,H=1120;
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
-renderer.setSize(W,H);renderer.setClearColor(0x000000,0);document.body.appendChild(renderer.domElement);
-const scene=new THREE.Scene();
-const cam=new THREE.PerspectiveCamera(30,1,0.1,100);cam.position.set(0,0.2,9.5);cam.lookAt(0,-0.1,0);
-scene.add(new THREE.HemisphereLight(0xdfeaff,0x061a33,1.4));
-const key=new THREE.DirectionalLight(0xffffff,1.6);key.position.set(3,4,6);scene.add(key);
-const rim=new THREE.DirectionalLight(0x9fc7ff,0.7);rim.position.set(-4,1,-3);scene.add(rim);
-// Deep blue material (same family as the organ art)
-const mat=new THREE.MeshStandardMaterial({color:0x0d3f6e,roughness:0.42,metalness:0.05,emissive:0x021a33,emissiveIntensity:0.25});
-// Path: stomach (top, pouch) -> duodenum loop -> jejunum/ileum coils (lower, loops)
-const pts=[
- [0.6,3.4,0],[0.9,2.7,0.1],[0.7,2.0,0.2],[-0.1,1.5,0.1],[-0.9,1.2,0.0],[-1.5,0.7,0.2],[-1.3,0.1,0.3],
- [-0.6,-0.1,0.3],[-0.9,-0.8,0.1],[-0.4,-1.2,0.0],[0.3,-0.9,0.4],[0.9,-0.4,0.3],[1.5,-0.9,0.1],[1.8,-1.6,0.2],
- [1.2,-2.2,0.3],[0.4,-1.9,0.6],[-0.4,-2.3,0.2],[-1.2,-2.0,0.3],[-1.6,-2.7,0.0],[-0.8,-3.1,0.2],[0.2,-2.8,0.1],[0.9,-3.2,0.3],[1.4,-2.8,0.5]
+// img2threejs reconstruction of D:\Downloads\small_intestine_2.jpg (1200 x 1200 reference).
+// Components: esophagus + J-shaped stomach + pylorus + duodenal C-loop (one swept tube with a radius
+// profile), and the jejunum/ileum mass (two layers of packed serpentine loops). Layout is traced in
+// reference pixel space and mapped to scene units; deep blue wet material to match the SHARE organ art.
+const W = 1120, H = 1120, SPAN = 2.5;
+const px = (x, y, z = 0) => new THREE.Vector3((x - 600) / 600 * SPAN, (600 - y) / 600 * SPAN, z);
+const pr = (r) => r / 600 * SPAN;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setClearColor(0x000000, 0);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const cam = new THREE.OrthographicCamera(-SPAN, SPAN, SPAN, -SPAN, 0.1, 50); cam.position.set(0, 0, 10); cam.lookAt(0, 0, 0);
+scene.add(new THREE.HemisphereLight(0xcfe3ff, 0x020c1c, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(3.5, 4.5, 6); scene.add(key);
+const fill = new THREE.DirectionalLight(0x8fb8ff, 0.6); fill.position.set(-5, -1, 4); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xb9d4ff, 0.9); rim.position.set(-2, 3, -5); scene.add(rim);
+
+const mat = new THREE.MeshPhysicalMaterial({ color: 0x1b4f86, roughness: 0.38, metalness: 0.0, clearcoat: 0.9, clearcoatRoughness: 0.22, sheen: 0.3, sheenColor: new THREE.Color(0x6fa0d8) });
+
+// Deterministic surface ripple (no Math.random): wrinkles along the bowel wall.
+const ripple = (v) => Math.sin(v.x * 9.1 + v.y * 3.7) * Math.sin(v.y * 8.3 - v.z * 5.1) * Math.sin(v.z * 6.7 + v.x * 4.3);
+
+// Sweep a tube through control points with a per-point radius. The tube is built at radius 1, then each
+// ring is scaled about its own centre, which keeps three.js's ring order and winding intact.
+function sweep(points, radii, segments, radial = 32, rippleAmp = 0.012) {
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  const geo = new THREE.TubeGeometry(curve, segments, 1, radial, false);
+  const pos = geo.attributes.position, n = points.length - 1, v = new THREE.Vector3(), c = new THREE.Vector3();
+  for (let i = 0; i <= segments; i++) {
+    const u = i / segments, t = curve.getUtoTmapping(u);
+    const f = t * n, k = Math.min(n - 1, Math.floor(f)), s = f - k, sm = s * s * (3 - 2 * s);
+    const r = radii[k] + (radii[k + 1] - radii[k]) * sm;
+    curve.getPointAt(u, c);
+    for (let j = 0; j <= radial; j++) {
+      const idx = i * (radial + 1) + j;
+      v.fromBufferAttribute(pos, idx).sub(c);
+      const dir = v.clone().normalize();
+      const rr = r * (1 + rippleAmp * ripple(c.clone().addScaledVector(dir, r)) / Math.max(r, 0.05) * 0.6);
+      v.copy(c).addScaledVector(dir, rr);
+      pos.setXYZ(idx, v.x, v.y, v.z);
+    }
+  }
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, mat);
+  scene.add(mesh);
+  // Rounded caps so open tube ends never show a hole.
+  [0, 1].forEach((end) => {
+    const p = curve.getPointAt(end), r = radii[end ? radii.length - 1 : 0];
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(r, radial, Math.max(8, radial / 2)), mat);
+    cap.position.copy(p); scene.add(cap);
+  });
+  return mesh;
+}
+
+// 1. Esophagus -> stomach (fundus, body, antrum) -> pylorus -> duodenal C-loop. [x, y, radius] in ref px.
+const upper = [
+  [548, -60, 14], [552, 30, 15], [572, 100, 17], [612, 142, 26],
+  [688, 132, 82], [762, 176, 132], [788, 262, 150], [758, 344, 138], [684, 392, 112],
+  [596, 394, 90], [526, 360, 64], [486, 336, 40], [462, 330, 28],
+  [424, 346, 25], [398, 396, 25], [408, 456, 26], [452, 506, 27], [532, 522, 27], [624, 500, 26], [706, 482, 25], [748, 506, 24],
 ];
-const K=0.66;const curve=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(p[0]*K,p[1]*K+0.05,p[2]*K)),false,"catmullrom",0.5);
-// Radius: stomach and duodenum wider, coils thinner, with haustral bulges
-function radius(t){const base=0.34-0.12*t;const fold=0.04*Math.sin(t*Math.PI*26);return base+fold;}
-const geo=new THREE.TubeGeometry(curve,700,1,40,false);
-const pos=geo.attributes.position;const n=geo.parameters.radialSegments;
-const frames=curve.computeFrenetFrames(700,false);
-for(let i=0;i<=700;i++){
-  const t=i/700;const c=curve.getPointAt(t);const r=radius(t)*1.0;
-  for(let j=0;j<=n;j++){
-    const idx=i*(n+1)+j;const N=frames.normals[i],B=frames.binormals[i];
-    const a=2*Math.PI*j/n;
-    pos.setXYZ(idx,c.x+r*(Math.cos(a)*N.x+Math.sin(a)*B.x),c.y+r*(Math.cos(a)*N.y+Math.sin(a)*B.y),c.z+r*(Math.cos(a)*N.z+Math.sin(a)*B.z));
+// Esophagus and duodenum are thin tubes; the stomach sack is a chain of overlapping spheres, because its
+// lesser curvature bends tighter than its own radius and a swept tube would pinch there.
+const P = (i) => px(upper[i][0], upper[i][1], i > 3 && i < 12 ? 0.15 : 0.05), R = (i) => pr(upper[i][2]);
+const idx = (a, b) => Array.from({ length: b - a + 1 }, (_, k) => a + k);
+sweep(idx(0, 4).map(P), idx(0, 4).map(R), 160, 28, 0.004);
+sweep(idx(11, 20).map(P), idx(11, 20).map(R), 400, 28, 0.01);
+{
+  const ids = idx(3, 12), curve = new THREE.CatmullRomCurve3(ids.map(P), false, 'centripetal');
+  const N = 260, sg = new THREE.SphereGeometry(1, 48, 32);
+  for (let i = 0; i <= N; i++) {
+    const u = i / N, f = curve.getUtoTmapping(u) * (ids.length - 1), k = Math.min(ids.length - 2, Math.floor(f)), s = f - k;
+    const r = R(ids[k]) + (R(ids[k + 1]) - R(ids[k])) * s * s * (3 - 2 * s);
+    const m = new THREE.Mesh(sg, mat); m.position.copy(curve.getPointAt(u)); m.scale.set(r, r, r * 0.8); scene.add(m);
   }
 }
-geo.computeVertexNormals();
-scene.add(new THREE.Mesh(geo,mat));
-// Stomach pouch: a soft ellipsoid at the top
-const pouch=new THREE.Mesh(new THREE.SphereGeometry(0.62*K,64,48),mat);pouch.scale.set(1.0,1.35,0.8);pouch.position.set(1.05*K,2.55*K+0.05,0);scene.add(pouch);
-renderer.render(scene,cam);
-window.__done=true;
+
+// 2. Jejunum/ileum: a Hilbert curve (order 3, 8 x 8 cells) mapped into the reference's trapezoid mass and
+//    smoothed. It folds both vertically and horizontally like the real loops, instead of even stripes.
+function hilbert(n) {
+  const out = [];
+  for (let d = 0; d < n * n; d++) {
+    let x = 0, y = 0, t = d;
+    for (let s = 1; s < n; s *= 2) {
+      const rx = 1 & (t / 2), ry = 1 & (t ^ rx);
+      if (ry === 0) { if (rx === 1) { x = s - 1 - x; y = s - 1 - y; } [x, y] = [y, x]; }
+      x += s * rx; y += s * ry; t = Math.floor(t / 4);
+    }
+    out.push([x, y]);
+  }
+  return out;
+}
+const top = 520, bot = 1110, left = (y) => 250 + (y - top) * 0.2, right = (y) => 920 - (y - top) * 0.3;
+const cells = hilbert(8), bp = [], br = [];
+cells.forEach(([cx, cy], i) => {
+  const v = (cy + 0.5) / 8, y = top + v * (bot - top);
+  const L = left(y), Rr = right(y), x = L + ((cx + 0.5) / 8) * (Rr - L);
+  // small deterministic jitter so rows do not read as a grid
+  const jx = 9 * Math.sin(i * 2.17), jy = 8 * Math.cos(i * 1.63);
+  bp.push(px(x + jx, y + jy, 0.18 * Math.sin(i * 0.9) + 0.12 * Math.cos(i * 0.37)));
+  br.push(pr(47 - v * 5) * (1 + 0.07 * Math.sin(i * 1.3)));
+});
+sweep(bp, br, cells.length * 14, 30, 0.016);
+
+renderer.render(scene, cam);
+window.__done = true;
 </script></body></html>

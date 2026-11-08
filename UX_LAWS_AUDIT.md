@@ -293,3 +293,8 @@ Checks:
 - Gold glows and tile borders (landing body map and the waiting-status dot) are now bubblegum pink.
 - The intestine tile uses a new deep blue line drawing, `assets/art/intestine.svg`, in place of the GI placeholder. It is a simple drawn illustration, not a medical reference image. Replace it with a licensed anatomical image if you have one.
 - Warning text and the demo-mode banner keep their yellow-brown, because they are warnings, not decoration.
+
+## Change on 2026-11-09: intestine engraving
+
+- Replaced the simple SVG with an engraving-style intestine (`assets/art/intestine.webp`, 560 x 560, transparent). It uses the same deep blue ink as the other organ art.
+- Drawn in code (Python imaging). The `/hyperframes` skill is built for video, so it was not used to draw the still image. A medical or licensed anatomy image would still be better for a clinical audience.

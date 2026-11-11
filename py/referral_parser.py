@@ -405,13 +405,113 @@ def _doctor_from_text(text):
     return "Dr. " + _clean(match.group(1)) if match else ""
 
 
+HRN_LABEL = (
+    r"(?:h\.?\s*r\.?\s*n\.?|hospital\s+record\s+(?:no|number|#)|hospital\s+(?:no|number|#)|"
+    r"hosp\.?\s*(?:no|number|#)|record\s+(?:no|number|#)|case\s+(?:no|number|#)|chart\s+(?:no|number|#))"
+)
+HRN_ID = r"(?:[A-Za-z]{1,4}-?)?\d(?:[\d-]*\d)?"
+HRN_RE = re.compile(
+    r"\b" + HRN_LABEL + r"\.?\s*(?:is\s+|[:#=-]\s*)*(" + HRN_ID + r")\b",
+    re.I,
+)
+TITLE_RE = re.compile(r"^(?:(?:mr|mrs|ms|mx|miss|pt|patient|pasyente)\.?\s+)+", re.I)
+NAME_STOP_RE = re.compile(
+    r"\s*(?:\b(?:hrn|hosp|hospital\s+(?:no|number|record)|record\s+no|case\s+no|age|sex|ward|room|bed|"
+    r"admitted|gcs|dx)\b|\d).*$",
+    re.I,
+)
+NOT_NAME_RE = re.compile(
+    r"\b(?:good|morning|afternoon|evening|doctors?|docs?|team|referr\w*|respectfully|po|hi|hello|share|"
+    r"service|zone|icu|ciu|nicu|picu|ward|room|bed|er|hospital|medical|center|centre|impression|diagnosis|"
+    r"brain|dead|death|declared|intubated|patient|male|female|years?|old)\b",
+    re.I,
+)
+NAME_WORD = r"[A-Za-zÑñ][A-Za-zÑñ.'-]*"
+
+
+def _name_like(value):
+    """'SANTOS, PEDRO' or 'Juan Dela Cruz': 1 to 6 letter words, starts with a capital, no clinical word."""
+    words = value.replace(",", " ").split()
+    if not 1 <= len(words) <= 6 or not value[:1].isupper():
+        return False
+    if not all(re.fullmatch(NAME_WORD, w) for w in words) or NOT_NAME_RE.search(value):
+        return False
+    return sum(len(re.sub(r"[^A-Za-zÑñ]", "", w)) for w in words) >= 3
+
+
 def _clean_name(value):
-    """Keep the name part of 'ANA REYES, 62 y/o female, Red Zone'."""
+    """Keep the name part of 'ANA REYES, 62 y/o female, Red Zone' or 'SANTOS, PEDRO (HRN 123456)'."""
     value = _clean(value)
-    parts = re.split(r"\s*(?:,|/|\s-\s|\()\s*", value, maxsplit=1)
-    if len(parts) == 2 and re.search(r"\d|\b(?:male|female|m|f)\b", parts[1], re.I):
-        value = parts[0]
-    value = re.sub(r"\s+\d{1,3}\s*(?:y/?o|yo|yrs?)?\s*(?:m|f|male|female)?$", "", value, flags=re.I)
+    value = re.sub(r"\s*\([^)]*\)?.*$", "", value)
+    value = TITLE_RE.sub("", value)
+    value = re.split(r"\s*(?:/|\s[-–]\s|;|\|)\s*", value, maxsplit=1)[0]
+    value = NAME_STOP_RE.sub("", value)
+    parts = [p for p in (_clean(p) for p in value.split(",")) if p]
+    kept = []
+    for part in parts[:3]:
+        if kept and not _name_like(part):
+            break
+        kept.append(part)
+    value = _clean(", ".join(kept))
+    last = value.rsplit(" ", 1)[-1]
+    if last.endswith(".") and len(last) > 3 and last.lower() not in ("jr.", "sr."):
+        value = value[:-1]
+    return value
+
+
+NAME_LEAD_RE = re.compile(
+    r"^.*?\b(?:respectfully\s+)?(?:referring|refer(?:ral|red)?\s+(?:of|for)?)\s*(?:po\s+)?(?:(?:the\s+)?patient\s*:?\s*)?",
+    re.I,
+)
+
+
+def _name_from_text(text):
+    """Patient name when no 'Name:' label exists. Returns '' when unsure."""
+    labelled = re.search(
+        r"\b(?:patient'?s?\s+name|name\s+of\s+(?:the\s+)?patient|pt\.?\s+name)\s*(?:is\s+|[-–=]\s*)?"
+        r"(" + NAME_WORD + r"(?:[ \t]*,?[ \t]+" + NAME_WORD + r"){0,5})"
+        r"|\bname\s*(?:is\s+|[-–=]\s*)(" + NAME_WORD + r"(?:[ \t]*,?[ \t]+" + NAME_WORD + r"){0,5})",
+        text, re.I,
+    )
+    if labelled:
+        name = _clean_name(labelled.group(1) or labelled.group(2))
+        if _name_like(name):
+            return name
+
+    lines = text.split("\n")
+    age_sex = re.compile(
+        r"\b\d{1,3}\s*(?:y/?o|yo|yrs?\.?(?:\s*old)?|years?(?:\s*old)?|y)?\s*[/,]?\s*(?:m|f|male|female)\b",
+        re.I,
+    )
+    for index, line in enumerate(lines):
+        match = age_sex.search(line)
+        if not match:
+            continue
+        before = line[:match.start()]
+        before = before.rsplit(":", 1)[-1] if ":" in before else before
+        before = TITLE_RE.sub("", _clean(NAME_LEAD_RE.sub("", _clean(before))))
+        name = _clean_name(before)
+        if name and _name_like(name):
+            return name
+        if not _clean(before) and index > 0:
+            previous = TITLE_RE.sub("", _clean(lines[index - 1]))
+            if previous and not previous.endswith(":") and _name_like(previous):
+                return _clean_name(previous)
+    return ""
+
+
+def _hrn_from_text(text):
+    match = HRN_RE.search(text or "")
+    if match and sum(ch.isdigit() for ch in match.group(1)) >= 3:
+        return match.group(1).upper()
+    return ""
+
+
+def _clean_hrn(value):
+    """'2026-123456 (old)' -> '2026-123456'. Keep the raw text when no number is in it."""
+    match = re.search(HRN_ID, value or "")
+    if match and sum(ch.isdigit() for ch in match.group(0)) >= 3:
+        return match.group(0).upper()
     return _clean(value)
 
 
@@ -546,8 +646,8 @@ def parse_referral(text, today=None):
     labelled = _labelled_values(text)
     warnings = []
 
-    fields["patient_name"] = _clean_name(labelled.get("patient_name", ""))
-    fields["hrn"] = labelled.get("hrn", "")
+    fields["patient_name"] = _clean_name(labelled.get("patient_name", "")) or _name_from_text(text)
+    fields["hrn"] = _clean_hrn(labelled.get("hrn", "")) or _hrn_from_text(text)
 
     age, sex = "", ""
     if labelled.get("age_sex"):

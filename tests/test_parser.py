@@ -140,6 +140,38 @@ class EdgeTests(unittest.TestCase):
         self.assertEqual(f["contact_number"], "09177654321")
 
 
+class NameAndHrnTests(unittest.TestCase):
+    """Patient name and HRN in the shapes doctors type them, with and without 'Label:'."""
+
+    CASES = [
+        ("NAME: SANTOS, PEDRO (HRN 123456)\nAGE/SEX: 57/M", "SANTOS, PEDRO", "123456"),
+        ("HRN 2026-004512\nPatient: Mr. Juan Dela Cruz", "Juan Dela Cruz", "2026-004512"),
+        ("Pt: ANA REYES, 62 y/o F, HRN# 00123456", "ANA REYES", "00123456"),
+        ("Referring patient DELA CRUZ, JUAN M., 45/M, Hosp no. 1234567, ICU", "DELA CRUZ, JUAN M.", "1234567"),
+        ("Hosp # 2026-1234 / Name - Maria Clara", "Maria Clara", "2026-1234"),
+        ("Respectfully referring:\nREYES, ANA B.\n62/F\nHRN: 778899", "REYES, ANA B.", "778899"),
+        ("Mr. Pedro Santos, 57 years old male, admitted 11/2/26", "Pedro Santos", ""),
+        ("Pt Name Juan Cruz\nHRN 445566", "Juan Cruz", "445566"),
+        ("Referring Juan Dela Cruz, 45 y/o male, from SPMC", "Juan Dela Cruz", ""),
+        ("Patient's name is Juan Cruz. Hospital number is 2026-555.", "Juan Cruz", "2026-555"),
+        ("HRN: 2026-123456 (old chart)", "", "2026-123456"),
+    ]
+
+    def test_cases(self):
+        for text, name, hrn in self.CASES:
+            with self.subTest(text=text):
+                f = parse_referral(text, TODAY)["fields"]
+                self.assertEqual((f["patient_name"], f["hrn"]), (name, hrn))
+
+    def test_greeting_and_ward_lines_are_not_names(self):
+        for text in ("Hi team\n57/M, CIU", "Good evening doctors, 45/M for BD eval", "Davao Doctors Hospital\n45/M"):
+            with self.subTest(text=text):
+                self.assertEqual(parse_referral(text, TODAY)["fields"]["patient_name"], "")
+
+    def test_prc_is_not_hrn(self):
+        self.assertEqual(parse_referral("Dr. Ana Lim, PRC no. 0123456", TODAY)["fields"]["hrn"], "")
+
+
 if __name__ == "__main__":
     unittest.main()
 
